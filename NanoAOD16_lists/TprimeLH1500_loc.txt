@@ -1,0 +1,1 @@
+/store/mc/RunIISummer16NanoAODv6/TprimeBToTZ_M-1500_LH_TuneCUETP8M1_13TeV-madgraph-pythia8/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/280000/F3D5202B-BA91-1A44-A3F0-D65A4E5E5ACF.root

@@ -1,0 +1,2 @@
+/store/mc/RunIISummer16NanoAODv6/ST_tW_antitop_5f_scaledown_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/260000/5CA45151-225F-7E4B-BECD-AD233BDDD5AD.root
+/store/mc/RunIISummer16NanoAODv6/ST_tW_antitop_5f_scaledown_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/260000/EE0E87DC-5101-B941-BB47-6F66534B2ABF.root

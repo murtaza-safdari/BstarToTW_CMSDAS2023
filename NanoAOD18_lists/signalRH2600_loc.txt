@@ -1,0 +1,2 @@
+/store/mc/RunIIAutumn18NanoAODv6/BstarToTW_M-2600_RH_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/240000/B4174CA9-7266-7B45-98E3-B79B9EE02952.root
+/store/mc/RunIIAutumn18NanoAODv6/BstarToTW_M-2600_RH_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/240000/6B149B76-53A4-A548-9E04-F2018938B136.root

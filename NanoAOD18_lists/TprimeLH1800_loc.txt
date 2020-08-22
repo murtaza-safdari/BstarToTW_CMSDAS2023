@@ -1,0 +1,3 @@
+/store/mc/RunIIAutumn18NanoAODv6/TprimeBToTZ_M-1800_LH_TuneCP5_PSweights_13TeV-madgraph_pythia8/NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/60000/E4DDED1A-851E-4147-B980-C439FD20A61D.root
+/store/mc/RunIIAutumn18NanoAODv6/TprimeBToTZ_M-1800_LH_TuneCP5_PSweights_13TeV-madgraph_pythia8/NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/60000/CEDCD5F3-1C07-C945-81E3-7F4341ACAB57.root
+/store/mc/RunIIAutumn18NanoAODv6/TprimeBToTZ_M-1800_LH_TuneCP5_PSweights_13TeV-madgraph_pythia8/NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/60000/930AC5F9-B28C-724E-9C7C-6786C80009C6.root
