@@ -9,9 +9,9 @@ using namespace std;
  * Use by building each map as <branchName, branchValue> and
  * then assigning to the correct struct member. */
 struct Collection {
-    map<string,int> Int,
-    map<string,bool> Bool,
-    map<string,RVec<float>> RVecFloat,
-    map<string,RVec<int>> RVecInt
+    map<string,int*> Int;
+    map<string,bool*> Bool;
+    map<string,RVec<float>*> RVecFloat;
+    map<string,RVec<int>*> RVecInt;
 };
 
