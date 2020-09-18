@@ -1,8 +1,28 @@
-from HAMMER.Analyzer import *
-from HAMMER.Tools.Common import *
+''' Selection script for b*->tW all-hadronic full run II analysis
+    Data and MC files are stored at `eos_path` and correspond to
+    NanoAOD that has been processed by NanoAOD-tools. The processing
+    required that each event have two jets with pt > 350 GeV and 
+    |eta| < 2.5 and ran the jetmetHelperRun2*, puWeightProducer,
+    and PrefireCorr modules.
+
+    *The jetmetHelperRun2 module used runs a custom version of fatJetUncertainties
+    that can be found at
+    https://github.com/lcorcodilos/nanoAOD-tools/blob/master/python/postprocessing/modules/jme/fatJetUncertainties.py
+    The main difference between this and the central version
+    is that this saves the individual corrections and NOT the 
+    already corrected pt and mass. This gives more freedom
+    to the end user and how the corrections are used (for example,
+    the central version only has variables suitable for W jets and not top jets).
+'''
+import sys
+sys.path.append('~/Projects/RDFanalyzer/TIMBER')
+
+# TIMBER
+from TIMBER.Analyzer import *
+from TIMBER.Tools.Common import *
+# Other
 from optparse import OptionParser
-import ROOT
-import time, glob
+import time
 
 parser = OptionParser()
 
@@ -21,67 +41,66 @@ parser.add_option('-c', '--config', metavar='FILE', type='string', action='store
 
 (options, args) = parser.parse_args()
 
-start_time = time.time()
+###########################################
+# Set some global variables for later use #
+###########################################
+eos_path = '/store/user/lcorcodi/bstar_nano/rootfiles/'
+file_path = eos_path+options.input
 
-cc = CommonCscripts()
+# Deduce set name from input file
+setname = options.input.replace('.root','')
+
+# Flags
+flags = ["Flag_goodVertices",
+        "Flag_globalTightHalo2016Filter", 
+        "Flag_eeBadScFilter", 
+        "Flag_HBHENoiseFilter", 
+        "Flag_HBHENoiseIsoFilter", 
+        "Flag_ecalBadCalibFilter", 
+        "Flag_EcalDeadCellTriggerPrimitiveFilter"]
+
+# Triggers
+if options.year == '16': 
+    triggers = ["HLT_PFHT800","HLT_PFHT900","HLT_PFJet450"]
+else: 
+    triggers = ["HLT_PFHT1050","HLT_PFJet500","HLT_AK8PFJet380_TrimMass30","HLT_AK8PFJet400_TrimMass30"]
+
+# Compile some C++ modules for use
+cc = CommonCscripts() # multiline strings as attributes that perform common tasks
 CompileCpp(cc.deltaPhi)
 CompileCpp(cc.vector)
 CompileCpp(cc.invariantMass)
-CompileCpp('bstar.cc')
+CompileCpp('bstar.cc') # custom .cc script
 
-#########
-# Setup #
-#########
-def main(options):
+###########################
+# Run analyzer on file(s) #
+###########################
+def run():
     ROOT.ROOT.EnableImplicitMT(4)
     a = analyzer(options.input)
 
-    setname = options.input.split('/')[-1].replace('.txt','').replace('.root','').replace('_loc','')
-    print 'Setname: %s'%setname
-
+    # Config loading - will have cuts, xsec, and lumi
     config = openJSON(options.config)
+    cuts = config['CUTS'][options.year]
     xsec, lumi = 1., 1.
     if setname in config['XSECS'].keys() and not a.isData: 
         xsec = config['XSECS'][setname]
         lumi = config['lumi']
-        
-    if "16" in options.year: year = "16"
-    elif "17" in options.year: year = "17"
-    elif "18" in options.year: year = "18"
-    cuts = config['CUTS'][year]
 
-    if not a.isData: norm = (xsec*lumi)/a.genEventCount
-    else: norm = 1.
+    # Determine normalization weight
+    if not a.isData: 
+        norm = (xsec*lumi)/a.genEventCount
+    else: 
+        norm = 1.
 
-    flags = ["Flag_goodVertices",
-               "Flag_globalTightHalo2016Filter", 
-               "Flag_eeBadScFilter", 
-               "Flag_HBHENoiseFilter", 
-               "Flag_HBHENoiseIsoFilter", 
-               "Flag_ecalBadCalibFilter", 
-               "Flag_EcalDeadCellTriggerPrimitiveFilter"]
-    flags = a.FilterColumnNames(flags)
-    flag_string = '('
-    for f in flags: flag_string += f +' && '
-    flag_string = flag_string[:-4] + ') == 1'
+    # Initial cuts
+    a.Cut('filters',a.GetFilterString(flags))
+    a.Cut('trigger',a.GetTriggerString(triggers))
+    a.Cut('nFatJets_cut','nFatJet > 1') # If we don't do this, we may try to access variables of jets that don't exist! (leads to seg fault)
+    a.Define('jetIdx','hemispherize(FatJet_phi, FatJet_jetId)') # need to calculate if we have two jets (with Id) that are back-to-back
+    a.Cut("hemis","(jetIdx[0] != -1)&&(jetIdx[1] != -1)") # cut on that calculation
 
-    ##################################
-    # Start an initial group of cuts #
-    ##################################
-    # Trigger
-    if a.isData:
-        if year == '16': trigs = ["HLT_PFHT800","HLT_PFHT900","HLT_PFJet450"]
-        else: trigs = ["HLT_PFHT1050","HLT_PFJet500","HLT_AK8PFJet380_TrimMass30","HLT_AK8PFJet400_TrimMass30"]
-        trigs = a.FilterColumnNames(trigs)
-        trig_string = ''
-        for t in trigs: trig_string += t + ' && '
-        a.Cut('trigger',trig_string[:-4])
-    # Filters and nJets
-    a.Cut("filters",flag_string)
-    a.Cut("nFatJets_cut","nFatJet > 1")
-    a.Define("jetIdx","hemispherize(FatJet_phi, FatJet_jetId)")
-
-    a.Cut("hemispherize","(jetIdx[0] != -1)&&(jetIdx[1] != -1)")
+    # Kinematics
     a.Cut("pt_cut","FatJet_pt[jetIdx[0]] > 400 && FatJet_pt[jetIdx[1]] > 400")
     a.Cut("eta_cut","abs(FatJet_eta[jetIdx[0]]) < 2.4 && abs(FatJet_eta[jetIdx[1]]) < 2.4")
 
@@ -89,7 +108,7 @@ def main(options):
     # Build some variables for jets #
     #################################
     # Wtagging decision logic
-    # Returns 0 for no tag, 1 for lead tag, 2 for sublead tag, and 3 for both tag (which is physics-wise equivalent to 2)
+    # This statement returns 0 for no tag, 1 for lead tag, 2 for sublead tag, and 3 for both tag (which is equivalent to 2 for the sake of deciding what is the W)
     wtag_str = "1*Wtag(FatJet_tau2[jetIdx[0]]/FatJet_tau1[jetIdx[0]],0,{0}, FatJet_msoftdrop[jetIdx[0]],65,105) + 2*Wtag(FatJet_tau2[jetIdx[1]]/FatJet_tau1[jetIdx[1]],0,{0}, FatJet_msoftdrop[jetIdx[1]],65,105)".format(cuts['tau21'])
 
     jets = VarGroup('jets')
@@ -103,10 +122,7 @@ def main(options):
     jets.Add("deltaY",      "lead_vect.Rapidity()-sublead_vect.Rapidity()")
     jets.Add("mtw",         "analyzer::invariantMass(lead_vect,sublead_vect)")
 
-    ########################
-    # Cut on new variables #
-    ########################
-    # Select real W and top
+    # W and top
     tagging_vars = VarGroup('tagging_vars') 
     tagging_vars.Add("mtop",        "top_index > -1 ? FatJet_msoftdrop[top_index] : -10")
     tagging_vars.Add("mW",          "w_index   > -1 ? FatJet_msoftdrop[w_index]: -10")
@@ -117,8 +133,6 @@ def main(options):
     tagging_vars.Add("wtag",'wtag_bit>0')
     tagging_vars.Add("top_tag",toptag_str)
  
-    a.Apply([tagging_vars])
-
     # Write cut on new column
     jet_sel = CutGroup('jet_sel')
     jet_sel.Add('wtag_cut','wtag')
@@ -128,12 +142,12 @@ def main(options):
     #########
     # Apply #
     #########
-    a.Apply([jet_sel])
+    a.Apply([jets,tagging_vars,jet_sel])
 
     # Finally discriminate on top tag
     final = a.Discriminate("top_tag_cut","top_tag==1")
 
-    outfile = TFile.Open('rootfiles/%s_%s.root'%(setname,year),'RECREATE')
+    outfile = TFile.Open('rootfiles/%s_%s.root'%(setname,options.year),'RECREATE')
     hpass = final["pass"].DataFrame.Histo2D(('MtwvMtPass','MtwvMtPass',60, 50, 350, 70, 500, 4000),'mtop','mtw')
     hfail = final["fail"].DataFrame.Histo2D(('MtwvMtFail','MtwvMtFail',60, 50, 350, 70, 500, 4000),'mtop','mtw')
     outfile.cd()
@@ -141,7 +155,8 @@ def main(options):
     hfail.Write()
     outfile.Close()
 
-# No multiprocessing
-main(options)
+if __name__ == "__main__":
+    start_time = time.time()
+    run(options)
 
-print "Total time: "+str((time.time()-start_time)/60.) + ' min'
+    print ("Total time: "+str((time.time()-start_time)/60.) + ' min')
