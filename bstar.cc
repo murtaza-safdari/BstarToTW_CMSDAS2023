@@ -3,11 +3,18 @@
 
 using namespace ROOT::VecOps;
 using namespace analyzer;
-
+/**
+    Checks for jets in opposite hemispheres (of phi) that also pass a jetId. 
+    Can optionally provide an index that reorders the jets if jet energy
+    corrections have altered the pt ordering.
+    @param jet_phi \f$\phi\f$ of each jet in the event.
+    @param jet_jetId Jet ID of each jet in the event.
+    @param index Alternate indexing of the jets if they need to be re-ordered
+*/
 RVec<int> hemispherize(RVec<float> jet_phi, RVec<int> jet_jetId, RVec<int> index = {}) {
     RVec<int> Jetsh0{};
     RVec<int> Jetsh1{};
-    RVec<int> LoopIndex{}; // Index that we actually want to loop over (ordered in real pt)
+    RVec<int> LoopIndex{}; /** Index that we actually want to loop over (ordered in real pt) */
     int nFatJets, first, second;
     std::vector<int> v(jet_phi.size());
 
@@ -21,7 +28,8 @@ RVec<int> hemispherize(RVec<float> jet_phi, RVec<int> jet_jetId, RVec<int> index
         LoopIndex = v; // Set loop index to standard one [0,1,...n]
     }
 
-    int highestPtIdx, thisIdx;
+    int highestPtIdx
+    int thisIdx;
     for (int i = 0; i < nFatJets; ++i) {
         highestPtIdx = LoopIndex[0];
         thisIdx = LoopIndex[i];
