@@ -45,10 +45,10 @@ parser.add_option('-c', '--config', metavar='FILE', type='string', action='store
 # Set some global variables for later use #
 ###########################################
 eos_path = '/store/user/lcorcodi/bstar_nano/rootfiles/'
-file_path = eos_path+options.input
+file_path = options.input
 
 # Deduce set name from input file
-setname = options.input.replace('.root','')
+setname = options.input.replace('.root','').split('/')[-1]
 
 # Flags
 flags = ["Flag_goodVertices",
@@ -75,7 +75,7 @@ CompileCpp('bstar.cc') # custom .cc script
 ###########################
 # Run analyzer on file(s) #
 ###########################
-def run():
+def run(options):
     ROOT.ROOT.EnableImplicitMT(4)
     a = analyzer(options.input)
 
@@ -94,7 +94,7 @@ def run():
         norm = 1.
 
     # Initial cuts
-    a.Cut('filters',a.GetFilterString(flags))
+    a.Cut('filters',a.GetFlagString(flags))
     a.Cut('trigger',a.GetTriggerString(triggers))
     a.Cut('nFatJets_cut','nFatJet > 1') # If we don't do this, we may try to access variables of jets that don't exist! (leads to seg fault)
     a.Define('jetIdx','hemispherize(FatJet_phi, FatJet_jetId)') # need to calculate if we have two jets (with Id) that are back-to-back
@@ -147,7 +147,7 @@ def run():
     # Finally discriminate on top tag
     final = a.Discriminate("top_tag_cut","top_tag==1")
 
-    outfile = TFile.Open('rootfiles/%s_%s.root'%(setname,options.year),'RECREATE')
+    outfile = ROOT.TFile.Open('Presel_%s.root'%(setname),'RECREATE')
     hpass = final["pass"].DataFrame.Histo2D(('MtwvMtPass','MtwvMtPass',60, 50, 350, 70, 500, 4000),'mtop','mtw')
     hfail = final["fail"].DataFrame.Histo2D(('MtwvMtFail','MtwvMtFail',60, 50, 350, 70, 500, 4000),'mtop','mtw')
     outfile.cd()
