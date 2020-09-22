@@ -28,7 +28,7 @@ RVec<int> hemispherize(RVec<float> jet_phi, RVec<int> jet_jetId, RVec<int> index
         LoopIndex = v; // Set loop index to standard one [0,1,...n]
     }
 
-    int highestPtIdx
+    int highestPtIdx;
     int thisIdx;
     for (int i = 0; i < nFatJets; ++i) {
         highestPtIdx = LoopIndex[0];
