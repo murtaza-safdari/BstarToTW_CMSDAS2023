@@ -50,14 +50,15 @@ file_path = options.input
 # Deduce set name from input file
 setname = options.input.replace('.root','').split('/')[-1]
 
-# Flags
+# Flags - https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
 flags = ["Flag_goodVertices",
-        "Flag_globalTightHalo2016Filter", 
-        "Flag_eeBadScFilter", 
+        "Flag_globalSuperTightHalo2016Filter", 
         "Flag_HBHENoiseFilter", 
-        "Flag_HBHENoiseIsoFilter", 
-        "Flag_ecalBadCalibFilter", 
-        "Flag_EcalDeadCellTriggerPrimitiveFilter"]
+        "Flag_HBHENoiseIsoFilter",
+        "Flag_EcalDeadCellTriggerPrimitiveFilter",
+        "Flag_BadPFMuonFilter" 
+        "Flag_ecalBadCalibReducedMINIAODFilter", 
+    ]
 
 # Triggers
 if options.year == '16': 
