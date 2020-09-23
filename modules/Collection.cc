@@ -1,5 +1,6 @@
 #include <map>
 #include <string>
+#include <ROOT/RVec.hxx>
 
 using namespace ROOT::VecOps;
 using namespace std;

@@ -1,14 +1,14 @@
 #include <map>
-#include <string>
-#include <vector>
 #include <algorithm>
 #include <numeric>
 #include <math.h>
 #include <cstdlib>
 #include "Collection.cc"
 #include "Pythonic.h"
+#include "Math/Vector4Dfwd.h"
 
 using namespace ROOT::VecOps;
+using LVector = ROOT::Math::PtEtaPhiMVector;
 
 /**Unwraps an integer to check for bitwise flags.
  * Checks if the bit of a number is true or false.
@@ -26,14 +26,14 @@ bool BitChecker(const int &bit, int &number){
 /** Stores identifying features of a particle in the GenPart collection */
 class Particle {
     public:
-        bool flag; /**< Should always be true unless we need to return a None-like particle */
+        bool flag = true; /**< Should always be true unless we need to return a None-like particle */
         int index; /**< Index in collection */
         int* pdgId; /**< PDG ID of particle */
         int* status; /**< Pythia status of particle */
         std::map <std::string, int> statusFlags; /**< Map of status flags for set gen particle  */
         int parentIndex; /**< Parent index  */
         std::vector<int> childIndex; /**< Children indices */
-        ROOT::Math::PtEtaPhiMVector vect; /**< Lorentz vector */
+        LVector vect; /**< Lorentz vector */
         Particle(){};
         void AddParent(int idx){
             parentIndex = idx;
@@ -41,6 +41,7 @@ class Particle {
         void AddChild(int idx){
             childIndex.push_back(idx);
         }
+        float DeltaR(LVector input_vector);
 };
 
 /**Map of the PDG ID values to the particle names.
@@ -89,8 +90,7 @@ class GenParticleTree
         Particle NoneParticle;
 
     public:
-        GenParticleTree(Collection GPOColl){
-            GenParts = GPOColl;
+        GenParticleTree(){
             NoneParticle.flag = false;
         };
 
@@ -126,11 +126,7 @@ class GenParticleObjs {
 
         Particle particle;
 
-        float DeltaR(ROOT::Math::PtEtaPhiMVector vect);
-        std::map< std::string, bool> CompareToVector(ROOT::Math::PtEtaPhiMVector vect);
-
+        std::map< std::string, bool> CompareToVector(LVector vect);
         Particle SetIndex(int idx);   
-
         int GetStatusFlag(std::string flagName);
-        GenParticleTree BuildTree();
 };

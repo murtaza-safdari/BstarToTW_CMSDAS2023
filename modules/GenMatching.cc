@@ -1,4 +1,12 @@
 #include "GenMatching.h"
+#include "Math/VectorUtil.h"
+
+/**Calculates $\f\Delta R$\f between current particle and input vector.
+ * @param vect The vector to compare against the current particle. 
+ * @return $\f\Delta R$\f value. */
+float Particle::DeltaR(LVector input_vector) {
+    return ROOT::Math::VectorUtil::DeltaR(vect,input_vector);
+};
 
 /**Constructor which takes in all info from the GenPart collection in NanoAOD 
  * Just assigns the inputs to internal variables.
@@ -53,12 +61,7 @@ void GenParticleObjs::SetStatusFlags(int particleIndex){
 // ************************ //
 // Physics member functions //
 // ************************ //
-/**Calculates $\f\Delta R$\f between current particle and input vector.
- * @param vect The vector to compare against the current particle. 
- * @return $\f\Delta R$\f value. */
-float GenParticleObjs::DeltaR(ROOT::Math::PtEtaPhiMVector vect) {
-    return ROOT::Math::VectorUtil::DeltaR(particle.vect,vect);
-};
+
 
 /**Compares set particle to a provided vector 
  * @param vect The vector to compare against the current particle. 
@@ -66,10 +69,10 @@ float GenParticleObjs::DeltaR(ROOT::Math::PtEtaPhiMVector vect) {
  * (deltaR < 0.8), "deltaM" (|delta m|/m_gen < 0.05) which 
  * all return bools. */
 std::map< std::string, bool> 
-    GenParticleObjs::CompareToVector(ROOT::Math::PtEtaPhiMVector vect) {
+    GenParticleObjs::CompareToVector(LVector vect) {
     std::map< std::string, bool> out;
     out["sameHemisphere"] = (ROOT::Math::VectorUtil::DeltaPhi(particle.vect,vect) < M_PI);
-    out["deltaR"] = (DeltaR(vect) < 0.8);
+    out["deltaR"] = (particle.DeltaR(vect) < 0.8);
     out["deltaM"] = (std::abs(vect.M() - particle.vect.M())/particle.vect.M() < 0.05);
     return out;
 };
@@ -99,11 +102,6 @@ Particle GenParticleObjs::SetIndex(int idx) {
 int GenParticleObjs::GetStatusFlag(std::string flagName){
     return particle.statusFlags[flagName];
 };
-
-GenParticleTree GenParticleObjs::BuildTree() {
-    GenParticleTree tree = GenParticleTree(GenPartCollection);
-    return tree;
-}
 
 //////////////////////////////////////
 // GenParticleTree Member Functions //
