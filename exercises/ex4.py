@@ -123,30 +123,28 @@ if __name__ == "__main__":
     for setname in signal_names+bkg_names:
         print ('Selecting for %s...'%setname)
     
-        # if 'QCD' in setname:
-        #     QCDs[setname] = select(setname,options.year)
-        # else:
+        # Write out histograms
         if options.select:
             histgroups[setname] = select(setname,options.year)
             outfile = ROOT.TFile.Open("rootfiles/%s_%s.root"%(setname,options.year),'RECREATE')
             outfile.cd()
             histgroups[setname].Do('Write')
             outfile.Close()
-        else:
-            infile = ROOT.TFile.Open("rootfiles/%s_%s.root"%(setname,options.year))
-            if infile == None:
-                raise TypeError("rootfiles/%s_%s.root does not exist"%(setname,options.year))
-            histgroups[setname] = HistGroup(setname)
-            for key in infile.GetListOfKeys():
-                keyname = key.GetName()
-                if setname not in keyname: continue
-                varname = '_'.join(keyname.split('_')[-2:])
-                inhist = infile.Get(key.GetName())
-                inhist.SetDirectory(0)
-                histgroups[setname].Add(varname,inhist)
+            del histgroups
             
-    # histgroups['QCD'] = StitchQCD(QCDs)
-
+        # Open histogram files for plotting
+        infile = ROOT.TFile.Open("rootfiles/%s_%s.root"%(setname,options.year))
+        if infile == None:
+            raise TypeError("rootfiles/%s_%s.root does not exist"%(setname,options.year))
+        histgroups[setname] = HistGroup(setname)
+        for key in infile.GetListOfKeys():
+            keyname = key.GetName()
+            if setname not in keyname: continue
+            varname = '_'.join(keyname.split('_')[-2:])
+            inhist = infile.Get(key.GetName())
+            inhist.SetDirectory(0)
+            histgroups[setname].Add(varname,inhist)
+            
     for varname in varnames.keys():
         plot_filename = 'plots/%s_%s.png'%(varname,options.year)
 
