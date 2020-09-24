@@ -2,7 +2,7 @@
    Apply simple kinematic selection and plot substructure variables
    for signal and background MC and compare.
 '''
-import ROOT, collections,sys
+import ROOT, collections,sys,os
 sys.path.append('./')
 from optparse import OptionParser
 from collections import OrderedDict
@@ -27,6 +27,9 @@ parser.add_option('--select', metavar='BOOL', action='store_true',
 ###########################################
 # Establish some global variables for use #
 ###########################################
+cernbox = '/eos/home-l/%s/Documents/plots'%(os.environ['USER']) # this is where we'll save your plots (accessible via web on cernbox.cern.ch)
+if not os.path.exists(cernbox):
+    os.makedirs(cernbox)
 rootfile_path = '/eos/user/c/cmsdas/long-exercises/bstarToTW/rootfiles/'
 config = 'bstar_config.json' # holds luminosities and cross sections
 CompileCpp('bstar.cc') # has the c++ functions we need when looping of the RDataFrame
@@ -160,7 +163,7 @@ if __name__ == "__main__":
             
     # For each variable to plot...
     for varname in varnames.keys():
-        plot_filename = 'plots/%s_%s.png'%(varname,options.year)
+        plot_filename = cernbox+'/%s_%s.png'%(varname,options.year)
 
         # Setup ordered dictionaries so processes plot in the order we specify
         bkg_hists,signal_hists = OrderedDict(),OrderedDict()
