@@ -28,10 +28,11 @@ parser.add_option('--select', metavar='BOOL', action='store_true',
 # Establish some global variables for use #
 ###########################################
 rootfile_path = '/eos/user/c/cmsdas/long-exercises/bstarToTW/rootfiles/'
-config = 'bstar_config.json'
-CompileCpp('bstar.cc')
+config = 'bstar_config.json' # holds luminosities and cross sections
+CompileCpp('bstar.cc') # has the c++ functions we need when looping of the RDataFrame
 
-signal_names = ['signalLH%s'%(mass) for mass in range(1400,4200,400)]
+# Sets we want to process and some nice naming for our plots
+signal_names = ['signalLH%s'%(mass) for mass in [2000]]#range(1400,4200,600)]
 bkg_names = ['singletop_tW','singletop_tWB','ttbar','QCDHT700','QCDHT1000','QCDHT1500','QCDHT2000']
 names = {
     "singletop_tW":"single top (tW)",
@@ -40,10 +41,24 @@ names = {
     "QCDHT700":"QCD",
     "QCDHT1000":"QCD",
     "QCDHT1500":"QCD",
-    "QCDHT2000":"QCD"
+    "QCDHT2000":"QCD",
+    "QCD":"QCD"
 }
 for sig in signal_names:
     names[sig] = "b*_{LH} %s (GeV)"%(sig[-4:])
+# ... and some nice colors
+colors = {}
+for p in signal_names+bkg_names:
+    if 'signal' in p:
+        colors[p] = ROOT.kCyan-int((int(p[-4:])-1400)/600)
+    elif 'ttbar' in p:
+        colors[p] = ROOT.kRed
+    elif 'singletop' in p:
+        colors[p] = ROOT.kBlue
+    elif 'QCD' in p:
+        colors[p] = ROOT.kYellow
+colors["QCD"] = ROOT.kYellow
+colors["singletop"] = ROOT.kBlue
 
 # Flags - https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
 flags = ["Flag_goodVertices",
@@ -60,6 +75,7 @@ if options.year == '16':
 else: 
     triggers = ["HLT_PFHT1050","HLT_PFJet500","HLT_AK8PFJet380_TrimMass30","HLT_AK8PFJet400_TrimMass30"]
 
+# Variables we want to plot (need to be constructed as variables in the RDataFrame)
 varnames = {
         'lead_tau32':'#tau_{32}^{jet0}',
         'sublead_tau32':'#tau_{32}^{jet1}',
@@ -67,23 +83,14 @@ varnames = {
         'sublead_tau21':'#tau_{21}^{jet1}'
     }
 
-colors = {}
-for p in signal_names+bkg_names:
-    if 'signal' in p:
-        colors[p] = ROOT.kCyan-int((int(p[-4:])-1400)/400)
-    elif 'ttbar' in p:
-        colors[p] = ROOT.kRed
-    elif 'singletop' in p:
-        colors[p] = ROOT.kBlue
-    elif 'QCD' in p:
-        colors[p] = ROOT.kYellow
 
 #########################################
 # Define function for actual processing #
 #########################################
 def select(setname,year):
-    ROOT.ROOT.EnableImplicitMT(2)
+    ROOT.ROOT.EnableImplicitMT(2) # Just use two threads - no need to kill the interactive nodes
 
+    # Initialize TIMBER analyzer
     file_path = '%s/%s_bstar%s.root' %(rootfile_path,setname, year)
     a = analyzer(file_path)
 
@@ -93,6 +100,7 @@ def select(setname,year):
     else: 
         norm = 1.
 
+    # Book actions on the RDataFrame
     a.Cut('filters',a.GetFlagString(flags))
     a.Cut('trigger',a.GetTriggerString(triggers))
     a.Cut('nFatJets_cut','nFatJet > 1') # If we don't do this, we may try to access variables of jets that don't exist! (leads to seg fault)
@@ -100,57 +108,79 @@ def select(setname,year):
     a.Cut("hemis","(jetIdx[0] != -1)&&(jetIdx[1] != -1)") # cut on that calculation
     a.Cut('pt_cut','FatJet_pt[jetIdx[0]] > 400 && FatJet_pt[jetIdx[1]] > 400')
     a.Cut('eta_cut','abs(FatJet_eta[jetIdx[0]]) < 2.4 && abs(FatJet_eta[jetIdx[1]]) < 2.4')
+    a.Cut('mjet_cut','FatJet_msoftdrop[jetIdx[0]] > 50 && FatJet_msoftdrop[jetIdx[1]] < 50')
+    a.Cut('mtw_cut','analyzer::invariantMass(jetIdx[0],jetIdx[1],FatJet_pt,FatJet_eta,FatJet_phi,FatJet_msoftdrop) > 1200')
     a.Define('lead_tau32','FatJet_tau2[jetIdx[0]] > 0 ? FatJet_tau3[jetIdx[0]]/FatJet_tau2[jetIdx[0]] : -1') # Conditional to make sure tau2 != 0 for division
     a.Define('sublead_tau32','FatJet_tau2[jetIdx[1]] > 0 ? FatJet_tau3[jetIdx[1]]/FatJet_tau2[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
     a.Define('lead_tau21','FatJet_tau1[jetIdx[0]] > 0 ? FatJet_tau2[jetIdx[0]]/FatJet_tau1[jetIdx[0]] : -1') # Conditional to make sure tau2 != 0 for division
     a.Define('sublead_tau21','FatJet_tau1[jetIdx[1]] > 0 ? FatJet_tau2[jetIdx[1]]/FatJet_tau1[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
     a.Define('norm',str(norm))
 
+    # Book a group to save the histograms
     out = HistGroup("%s_%s"%(setname,year))
     for varname in varnames.keys():
         histname = '%s_%s_%s'%(setname,year,varname)
-        hist_tuple = (histname,histname,20,0,1)
-        hist = a.GetActiveNode().DataFrame.Histo1D(hist_tuple,varname,'norm')
-        hist.GetValue()
-        out.Add(varname,hist)
+        hist_tuple = (histname,histname,20,0,1) # Arguments for binning that you would normally pass to a TH1
+        hist = a.GetActiveNode().DataFrame.Histo1D(hist_tuple,varname,'norm') # Project dataframe into a histogram (hist name/binning tuple, variable to plot from dataframe, weight)
+        hist.GetValue() # This gets the actual TH1 instead of a pointer to the TH1
+        out.Add(varname,hist) # Add it to our group
 
+    # Return the group
     return out
 
 # Runs when calling `python ex4.py`
 if __name__ == "__main__":
-    histgroups = {}
-    QCDs = {}
+    histgroups = {} # all of the HistGroups we want to track
     for setname in signal_names+bkg_names:
         print ('Selecting for %s...'%setname)
     
-        # Write out histograms
+        # Perform selection and write out histograms if using --select
         if options.select:
-            histgroups[setname] = select(setname,options.year)
+            histgroup = select(setname,options.year)
             outfile = ROOT.TFile.Open("rootfiles/%s_%s.root"%(setname,options.year),'RECREATE')
             outfile.cd()
-            histgroups[setname].Do('Write')
+            histgroup.Do('Write') # This will call TH1.Write() for all of the histograms in the group
             outfile.Close()
-            del histgroups
+            del histgroup # Now that they are saved out, drop from memory
             
-        # Open histogram files for plotting
+        # Open histogram files that we saved
         infile = ROOT.TFile.Open("rootfiles/%s_%s.root"%(setname,options.year))
+        # ... raise exception if we forgot to run with --select!
         if infile == None:
             raise TypeError("rootfiles/%s_%s.root does not exist"%(setname,options.year))
+        # Put histograms back into HistGroups
         histgroups[setname] = HistGroup(setname)
-        for key in infile.GetListOfKeys():
+        for key in infile.GetListOfKeys(): # loop over histograms in the file
             keyname = key.GetName()
-            if setname not in keyname: continue
-            varname = '_'.join(keyname.split('_')[-2:])
-            inhist = infile.Get(key.GetName())
-            inhist.SetDirectory(0)
-            histgroups[setname].Add(varname,inhist)
+            if setname not in keyname: continue # skip if it's not for the current set we are on
+            varname = '_'.join(keyname.split('_')[-2:]) # get the variable name (ex. lead_tau32)
+            inhist = infile.Get(key.GetName()) # get it from the file
+            inhist.SetDirectory(0) # set the directory so hist is stored in memory and not as reference to TFile (this way it doesn't get tossed by python garbage collection when infile changes)
+            histgroups[setname].Add(varname,inhist) # add to our group
             
+    # For each variable to plot...
     for varname in varnames.keys():
         plot_filename = 'plots/%s_%s.png'%(varname,options.year)
 
+        # Setup ordered dictionaries so processes plot in the order we specify
         bkg_hists,signal_hists = OrderedDict(),OrderedDict()
-        for bkg in bkg_names: bkg_hists[bkg] = histgroups[bkg][varname]
-        for sig in signal_names: signal_hists[sig] = histgroups[sig][varname]
+        # Get the backgrounds
+        for bkg in bkg_names: 
+            if 'QCD' in bkg: # Add the QCD HT bins together for one QCD sample
+                if 'QCD' not in bkg_hists.keys():
+                    bkg_hists['QCD'] = histgroups[bkg][varname].Clone('QCD_'+varname)
+                else:
+                    bkg_hists['QCD'].Add(histgroups[bkg][varname])
+            elif 'singletop' in bkg: # Add the single top channels together for one single top sample
+                if 'singletop' not in bkg_hists.keys():
+                    bkg_hists['singletop'] = histgroups[bkg][varname].Clone('singletop_'+varname)
+                else:
+                    bkg_hists['singletop'].Add(histgroups[bkg][varname])
+            else: # add everything else normally (ttbar)
+                bkg_hists[bkg] = histgroups[bkg][varname]#all_hists[bkg] = histgroups[bkg][varname]#
+                
+        # Add the signals
+        for sig in signal_names: signal_hists[sig] = histgroups[sig][varname]#all_hists[sig] = histgroups[sig][varname]#
 
-        CompareShapes(plot_filename,options.year,varnames[varname],bkg_hists,signal_hists,colors=colors,names=names)
-    
+        # Plot everything together!
+        CompareShapes(plot_filename,options.year,varnames[varname],bkgs=bkg_hists,signals=signal_hists,colors=colors,names=names)
