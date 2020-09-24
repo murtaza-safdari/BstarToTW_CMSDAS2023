@@ -2,7 +2,8 @@
    Apply simple kinematic selection and plot substructure variables
    for signal and background MC and compare.
 '''
-import ROOT, collections
+import ROOT, collections,sys
+sys.path.append('./')
 from optparse import OptionParser
 from collections import OrderedDict
 
@@ -81,9 +82,9 @@ for p in signal_names+bkg_names:
 # Define function for actual processing #
 #########################################
 def select(setname,year):
-    ROOT.ROOT.EnableImplicitMT(6)
+    ROOT.ROOT.EnableImplicitMT(2)
 
-    file_path = '/home/lucas/Projects/RDFanalyzer/TIMBER/examples/ttbar16_sample.root'#rootfile_path + '/%s_bstar%s.root' %(setname, year)
+    file_path = '%s/%s_bstar%s.root' %(rootfile_path,setname, year)
     a = analyzer(file_path)
 
     # Determine normalization weight
