@@ -1,5 +1,6 @@
 #include <math.h>
 #include <tuple>
+#include "Framework/common.h"
 
 using namespace ROOT::VecOps;
 using namespace analyzer;
