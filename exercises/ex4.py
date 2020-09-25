@@ -27,7 +27,7 @@ parser.add_option('--select', metavar='BOOL', action='store_true',
 ###########################################
 # Establish some global variables for use #
 ###########################################
-cernbox = '/eos/home-%s/%s/Documents/plots'%(os.environ['USER'][0],os.environ['USER'][0]) # this is where we'll save your plots (accessible via web on cernbox.cern.ch)
+cernbox = '/eos/home-%s/%s/Documents/plots'%(os.environ['USER'][0],os.environ['USER']) # this is where we'll save your plots (accessible via web on cernbox.cern.ch)
 if not os.path.exists(cernbox):
     os.makedirs(cernbox)
 rootfile_path = '/eos/user/c/cmsdas/long-exercises/bstarToTW/rootfiles/'
@@ -157,7 +157,7 @@ if __name__ == "__main__":
         for key in infile.GetListOfKeys(): # loop over histograms in the file
             keyname = key.GetName()
             if setname not in keyname: continue # skip if it's not for the current set we are on
-            varname = '_'.join(keyname.split('_')[-2:]) # get the variable name (ex. lead_tau32)
+            varname = keyname[len(setname+'_'+options.year)+1:] # get the variable name (ex. lead_tau32)
             inhist = infile.Get(key.GetName()) # get it from the file
             inhist.SetDirectory(0) # set the directory so hist is stored in memory and not as reference to TFile (this way it doesn't get tossed by python garbage collection when infile changes)
             histgroups[setname].Add(varname,inhist) # add to our group
