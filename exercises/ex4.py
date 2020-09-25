@@ -27,7 +27,7 @@ parser.add_option('--select', metavar='BOOL', action='store_true',
 ###########################################
 # Establish some global variables for use #
 ###########################################
-cernbox = '/eos/home-l/%s/Documents/plots'%(os.environ['USER']) # this is where we'll save your plots (accessible via web on cernbox.cern.ch)
+cernbox = '/eos/home-%s/%s/Documents/plots'%(os.environ['USER'][0],os.environ['USER'][0]) # this is where we'll save your plots (accessible via web on cernbox.cern.ch)
 if not os.path.exists(cernbox):
     os.makedirs(cernbox)
 rootfile_path = '/eos/user/c/cmsdas/long-exercises/bstarToTW/rootfiles/'
@@ -45,7 +45,8 @@ names = {
     "QCDHT1000":"QCD",
     "QCDHT1500":"QCD",
     "QCDHT2000":"QCD",
-    "QCD":"QCD"
+    "QCD":"QCD",
+    "singletop":"single top (tW)"
 }
 for sig in signal_names:
     names[sig] = "b*_{LH} %s (GeV)"%(sig[-4:])
@@ -169,6 +170,7 @@ if __name__ == "__main__":
         bkg_hists,signal_hists = OrderedDict(),OrderedDict()
         # Get the backgrounds
         for bkg in bkg_names: 
+            histgroups[bkg][varname].SetTitle('%s 20%s'%(varname, options.year)) # empty title
             if 'QCD' in bkg: # Add the QCD HT bins together for one QCD sample
                 if 'QCD' not in bkg_hists.keys():
                     bkg_hists['QCD'] = histgroups[bkg][varname].Clone('QCD_'+varname)
