@@ -67,10 +67,6 @@ else:
     triggers = ["HLT_PFHT1050","HLT_PFJet500","HLT_AK8PFJet380_TrimMass30","HLT_AK8PFJet400_TrimMass30"]
 
 # Compile some C++ modules for use
-cc = CommonCscripts() # multiline strings as attributes that perform common tasks
-CompileCpp(cc.deltaPhi)
-CompileCpp(cc.vector)
-CompileCpp(cc.invariantMass)
 CompileCpp('bstar.cc') # custom .cc script
 
 ###########################
