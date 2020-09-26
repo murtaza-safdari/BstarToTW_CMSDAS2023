@@ -44,9 +44,6 @@ parser.add_option('-c', '--config', metavar='FILE', type='string', action='store
 ###########################################
 # Set some global variables for later use #
 ###########################################
-eos_path = '/store/user/lcorcodi/bstar_nano/rootfiles/'
-file_path = options.input
-
 # Deduce set name from input file
 setname = options.input.replace('.root','').split('/')[-1]
 
