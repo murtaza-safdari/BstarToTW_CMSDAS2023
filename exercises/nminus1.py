@@ -66,7 +66,7 @@ colors["QCD"] = ROOT.kYellow
 colors["singletop"] = ROOT.kBlue
 # ... and names
 prettynames = {
-    'deltaY':'#Delta y',
+    'deltaY':'|#Delta y|',
     'tau21':'#tau_{2} / #tau_{1}',
     'mW':'m_{W} [GeV]',
     'tau32':'#tau_{3} / #tau_{2}',
@@ -130,7 +130,7 @@ def select(setname,year):
     # Calculate some new comlumns that we'd like to cut on (that were costly to do before the other filtering)
     jets.Add("lead_vect",   "analyzer::TLvector(FatJet_pt[jetIdx[0]],FatJet_eta[jetIdx[0]],FatJet_phi[jetIdx[0]],FatJet_msoftdrop[jetIdx[0]])")
     jets.Add("sublead_vect","analyzer::TLvector(FatJet_pt[jetIdx[1]],FatJet_eta[jetIdx[1]],FatJet_phi[jetIdx[1]],FatJet_msoftdrop[jetIdx[1]])")
-    jets.Add("deltaY",      "lead_vect.Rapidity()-sublead_vect.Rapidity()")
+    jets.Add("deltaY",      "abs(lead_vect.Rapidity()-sublead_vect.Rapidity())")
     jets.Add("mtw",         "analyzer::invariantMass(lead_vect,sublead_vect)")
     
     #########
@@ -144,7 +144,7 @@ def select(setname,year):
     plotting_vars.Add("tau21",       "FatJet_tau2[jetIdx[1]]/FatJet_tau1[jetIdx[1]]")
 
     N_cuts = CutGroup('Ncuts') # cuts
-    N_cuts.Add("deltaY_cut",      "abs(deltaY)<1.6")
+    N_cuts.Add("deltaY_cut",      "deltaY<1.6")
     N_cuts.Add("mtop_cut",        "(mtop > 105.)&&(mtop < 220.)")
     N_cuts.Add("mW_cut",          "(mW > 65.)&&(mW < 105.)")
     N_cuts.Add("tau32_cut",       "(tau32 > 0.0)&&(tau32 < %s)"%(cuts['tau32']))
@@ -161,7 +161,7 @@ def select(setname,year):
         'tau32': [20,0,1],
         'tau21': [20,0,1],
         'subjet_btag': [20,0,1],
-        'deltaY': [40,-2.0,2.0]
+        'deltaY': [20,0,2.0]
     }
     # Add hists to group and write out
     for nkey in nminus1Nodes.keys():
