@@ -2,7 +2,8 @@ from TIMBER.Tools.Common import openJSON
 
 def getNormFactor(setname,year,configPath,genEventCount):
     # Config loading - will have cuts, xsec, and lumi
-    config = openJSON(configPath)
+    if isinstance(configPath,str): config = openJSON(configPath)
+    else: config = configPath
     cuts = config['CUTS'][year]
     lumi = config['lumi']
     if setname in config['XSECS'].keys(): 
