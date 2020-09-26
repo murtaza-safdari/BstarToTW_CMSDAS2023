@@ -236,6 +236,6 @@ if __name__ == "__main__":
 
         # Plot everything together!
         print ('Plotting %s'%(plot_filename))
-        CompareShapes(plot_filename,options.year,prettynames[varname],bkgs=bkg_hists,signals=signal_hists,colors=colors,names=names,stackBkg=True)
+        helpers.CompareShapesWithSoverB(plot_filename,options.year,prettynames[varname],bkgs=bkg_hists,signals=signal_hists,colors=colors,names=names,stackBkg=True)
 
     print ("Total time: "+str((time.time()-start_time)/60.) + ' min')
