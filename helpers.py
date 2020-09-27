@@ -144,11 +144,27 @@ def CompareShapesWithSoverB(outfilename,year,prettyvarname,bkgs={},signals={},na
     #
     # Make the S/sqrt(B) sub pad with dedicated function
     #
-    s_over_b = MakeSoverB(bkgStack,signals.values()[0])
+    s_over_b,line_pos = MakeSoverB(bkgStack,signals.values()[0])
     SoverB.cd()
     s_over_b.GetYaxis().SetTitle('S/#sqrt{B}')
-    s_over_b.SetFillColor(ROOT.kBlue)
+    s_over_b.GetXaxis().SetTitle(prettyvarname)
+    s_over_b.SetTitle('')
+    s_over_b.SetLineColorAlpha(ROOT.kBlack,1)
+    s_over_b.SetLineWidth(2)
+    s_over_b.SetFillColorAlpha(ROOT.kWhite,0)
+    s_over_b.GetYaxis().SetLabelSize(0.08)
+    s_over_b.GetYaxis().SetTitleSize(0.08)
+    s_over_b.GetYaxis().SetNdivisions(306)
+    s_over_b.GetXaxis().SetLabelSize(0.09)
+    s_over_b.GetXaxis().SetTitleSize(0.09)
+    s_over_b.GetYaxis().SetTitleOffset(0.4)
     s_over_b.Draw('hist')
+    if line_pos:
+        line = ROOT.TLine(line_pos,s_over_b.GetMinimum(),line_pos,s_over_b.GetMaximum())
+        line.SetLineColor(ROOT.kRed)
+        line.SetLineStyle(10)
+        line.SetLineWidth(2)
+        line.Draw('same')
 
     # Canvas wide settings
     c.cd()
@@ -210,6 +226,7 @@ def MakeSoverB(stack_of_bkgs,signal):
             forward = True
         else:
             forward = True
+        peak_bin = False
         print 'Not a mass distribution. Forward = %s'%forward
     # If peak is non-zero, do background cumulative scan to left of peak
     # and forward scan to right  
@@ -217,21 +234,11 @@ def MakeSoverB(stack_of_bkgs,signal):
         forward = None
         print 'Mass-like distribution.'
         # Clone original distirbution, set new range around peak, get cumulative
-        bkg_int_low = total_bkgs.Clone()
-        bkg_int_low.GetXaxis().Set(peak_bin-1,1,peak_bin)
-        bkg_int_low = bkg_int_low.GetCumulative(False)
+        bkg_int_low  = MakeCumulative(total_bkgs,1,       peak_bin,forward=False)
+        bkg_int_high = MakeCumulative(total_bkgs,peak_bin,nbins+1, forward=True)
 
-        bkg_int_high = total_bkgs.Clone()
-        bkg_int_high.GetXaxis().Set(nbins+1-peak_bin,peak_bin,nbins+1)
-        bkg_int_high = bkg_int_high.GetCumulative(True)
-
-        sig_int_low = signal.Clone()
-        sig_int_low.GetXaxis().Set(peak_bin-1,1,peak_bin)
-        sig_int_low = sig_int_low.GetCumulative(False)
-
-        sig_int_high = signal.Clone()
-        sig_int_high.GetXaxis().Set(nbins+1-peak_bin,peak_bin,nbins+1)
-        sig_int_high = sig_int_high.GetCumulative(True)
+        sig_int_low  = MakeCumulative(signal,1,       peak_bin,forward=False)
+        sig_int_high = MakeCumulative(signal,peak_bin,nbins+1, forward=True)
 
         # Make empty versions of original histograms
         bkg_int = total_bkgs.Clone()
@@ -239,25 +246,24 @@ def MakeSoverB(stack_of_bkgs,signal):
         sig_int = signal.Clone()
         sig_int.Reset()     
 
-        # Fill with our cumulative distribtuions
-        for ix in range(1,nbins):
-            if ix < peak_bin:
-                bkg_int.SetBinContent(ix,bkg_int_low.GetBinContent(ix))
-                sig_int.SetBinContent(ix,sig_int_low.GetBinContent(ix))
-            else:
-                bkg_int.SetBinContent(ix,bkg_int_high.GetBinContent(ix-peak_bin+1))
-                sig_int.SetBinContent(ix,sig_int_high.GetBinContent(ix-peak_bin+1))
+        bkg_int.Add(bkg_int_low)
+        bkg_int.Add(bkg_int_high)
+        sig_int.Add(sig_int_low)
+        sig_int.Add(sig_int_high)
 
     if forward != None:
-        bkg_int = total_bkgs.GetCumulative(forward)
-        sig_int = signal.GetCumulative(forward)
+        # if forward == False:
+        #     total_bkgs.GetXaxis().SetRange(0,total_bkgs.GetNbinsX())
+        #     signal.GetXaxis().SetRange(0,signal.GetNbinsX())
+        bkg_int = MakeCumulative(total_bkgs,1, total_bkgs.GetNbinsX()+1,forward)
+        sig_int = MakeCumulative(signal,    1, signal.GetNbinsX()+1,    forward)
         
     # Clone and empty one for binning structure
     s_over_b = bkg_int.Clone()
     s_over_b.Reset()
 
     # Build s/sqrt(b) per-bin
-    for ix in range(1,bkg_int.GetNbinsX()):
+    for ix in range(1,nbins+1):
         if bkg_int.GetBinContent(ix) != 0:
             val = sig_int.GetBinContent(ix)/math.sqrt(bkg_int.GetBinContent(ix))
             s_over_b.SetBinContent(ix,val)
@@ -265,6 +271,20 @@ def MakeSoverB(stack_of_bkgs,signal):
             s_over_b.SetBinContent(ix,0)
             print ('WARNING: Background is empty for bin %s'%ix)
         
-    return s_over_b
+    peak_bin_edge = False
+    if peak_bin != False:
+        peak_bin_edge = bkg_int.GetBinLowEdge(peak_bin)
 
-    
+    return s_over_b, peak_bin_edge
+
+def MakeCumulative(hist,low,high,forward=True):
+    out = hist.Clone(hist.GetName()+'_cumul')
+    out.Reset()
+    prev = 0
+    if forward: to_scan = range(low,high)
+    else: to_scan = range(high-1,low-1,-1)
+    for ix in to_scan:
+        val = prev + hist.GetBinContent(ix)
+        out.SetBinContent(ix,val)
+        prev = val
+    return out
