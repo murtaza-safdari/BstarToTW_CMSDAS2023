@@ -211,6 +211,7 @@ if __name__ == "__main__":
             
     # For each variable to plot...
     for varname in varnames:
+        if varname == 'deltaY': continue # deltaY optimization requires cuts on mtw to make sense so skipping
         plot_filename = cernbox+'/%s_%s_Nminus1.png'%(varname,options.year)
 
         # Setup ordered dictionaries so processes plot in the order we specify
