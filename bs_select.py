@@ -15,7 +15,6 @@
     the central version only has variables suitable for W jets and not top jets).
 '''
 import sys
-sys.path.append('~/Projects/RDFanalyzer/TIMBER')
 
 # TIMBER
 from TIMBER.Analyzer import *
@@ -90,8 +89,8 @@ def run(options):
     # Initial cuts
     a.Cut('filters',a.GetFlagString(flags))
     a.Cut('trigger',a.GetTriggerString(triggers))
-    a.Cut('nFatJets_cut','nFatJet > 1') # If we don't do this, we may try to access variables of jets that don't exist! (leads to seg fault)
     a.Define('jetIdx','hemispherize(FatJet_phi, FatJet_jetId)') # need to calculate if we have two jets (with Id) that are back-to-back
+    a.Cut('nFatJets_cut','nFatJet > max(jetIdx[0], jetIdx[1])') # If we don't do this, we may try to access variables of jets that don't exist! (leads to seg fault)
     a.Cut("hemis","(jetIdx[0] != -1)&&(jetIdx[1] != -1)") # cut on that calculation
 
     # Kinematics

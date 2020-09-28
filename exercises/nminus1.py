@@ -109,7 +109,7 @@ def select(setname,year):
     a.Cut('filters',a.GetFlagString(flags))
     a.Cut('trigger',a.GetTriggerString(triggers))
     a.Define('jetIdx','hemispherize(FatJet_phi, FatJet_jetId)') # need to calculate if we have two jets (with Id) that are back-to-back
-    a.Cut('nFatJets_cut','nFatJet >= max(jetIdx[0],jetIdx[1])') # If we don't do this, we may try to access variables of jets that don't exist! (leads to seg fault)
+    a.Cut('nFatJets_cut','nFatJet > max(jetIdx[0],jetIdx[1])') # If we don't do this, we may try to access variables of jets that don't exist! (leads to seg fault)
     a.Cut("hemis","(jetIdx[0] != -1)&&(jetIdx[1] != -1)") # cut on that calculation
     a.Cut('pt_cut','FatJet_pt[jetIdx[0]] > 400 && FatJet_pt[jetIdx[1]] > 400')
     a.Cut('eta_cut','abs(FatJet_eta[jetIdx[0]]) < 2.4 && abs(FatJet_eta[jetIdx[1]]) < 2.4')
