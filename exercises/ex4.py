@@ -70,8 +70,8 @@ flags = ["Flag_goodVertices",
         "Flag_HBHENoiseFilter", 
         "Flag_HBHENoiseIsoFilter",
         "Flag_EcalDeadCellTriggerPrimitiveFilter",
-        "Flag_BadPFMuonFilter",
-        "Flag_ecalBadCalibReducedMINIAODFilter"
+        "Flag_BadPFMuonFilter"
+        #"Flag_ecalBadCalibReducedMINIAODFilter"  # Still work in progress flag, may not be used
     ]
 # Triggers
 if options.year == '16': 
