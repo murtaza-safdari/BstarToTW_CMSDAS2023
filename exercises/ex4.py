@@ -84,7 +84,12 @@ varnames = {
         'lead_tau32':'#tau_{32}^{jet0}',
         'sublead_tau32':'#tau_{32}^{jet1}',
         'lead_tau21':'#tau_{21}^{jet0}',
-        'sublead_tau21':'#tau_{21}^{jet1}'
+        'sublead_tau21':'#tau_{21}^{jet1}',
+        'lead_jetPt':'p_{T}^{jet0}',
+        'sublead_jetPt':'p_{T}^{jet1}',
+        'deltaphi':'#Delta#phi_{jet0,jet1}',
+        'lead_softdrop_mass':'m_{SD}^{jet0}',
+        'sublead_softdrop_mass':'m_{SD}^{jet1}',
     }
 
 
@@ -108,23 +113,36 @@ def select(setname,year):
     a.Cut('filters',a.GetFlagString(flags))
     a.Cut('trigger',a.GetTriggerString(triggers))
     a.Define('jetIdx','hemispherize(FatJet_phi, FatJet_jetId)') # need to calculate if we have two jets (with Id) that are back-to-back
-    a.Cut('nFatJets_cut','nFatJet >= max(jetIdx[0],jetIdx[1])') # If we don't do this, we may try to access variables of jets that don't exist! (leads to seg fault)
+    a.Cut('nFatJets_cut','nFatJet > max(jetIdx[0],jetIdx[1])') # If we don't do this, we may try to access variables of jets that don't exist! (leads to seg fault)
     a.Cut("hemis","(jetIdx[0] != -1)&&(jetIdx[1] != -1)") # cut on that calculation
     a.Cut('pt_cut','FatJet_pt[jetIdx[0]] > 400 && FatJet_pt[jetIdx[1]] > 400')
     a.Cut('eta_cut','abs(FatJet_eta[jetIdx[0]]) < 2.4 && abs(FatJet_eta[jetIdx[1]]) < 2.4')
     a.Cut('mjet_cut','FatJet_msoftdrop[jetIdx[0]] > 50 && FatJet_msoftdrop[jetIdx[1]] > 50')
     a.Cut('mtw_cut','analyzer::invariantMass(jetIdx[0],jetIdx[1],FatJet_pt,FatJet_eta,FatJet_phi,FatJet_msoftdrop) > 1200')
+    a.Define('deltaphi','analyzer::deltaPhi(FatJet_phi[jetIdx[0]],FatJet_phi[jetIdx[1]])')
     a.Define('lead_tau32','FatJet_tau2[jetIdx[0]] > 0 ? FatJet_tau3[jetIdx[0]]/FatJet_tau2[jetIdx[0]] : -1') # Conditional to make sure tau2 != 0 for division
     a.Define('sublead_tau32','FatJet_tau2[jetIdx[1]] > 0 ? FatJet_tau3[jetIdx[1]]/FatJet_tau2[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
     a.Define('lead_tau21','FatJet_tau1[jetIdx[0]] > 0 ? FatJet_tau2[jetIdx[0]]/FatJet_tau1[jetIdx[0]] : -1') # Conditional to make sure tau2 != 0 for division
     a.Define('sublead_tau21','FatJet_tau1[jetIdx[1]] > 0 ? FatJet_tau2[jetIdx[1]]/FatJet_tau1[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
+    a.Define('lead_jetPt','FatJet_pt[jetIdx[0]]')
+    a.Define('sublead_jetPt','FatJet_pt[jetIdx[1]]')
+    a.Define('lead_softdrop_mass','FatJet_msoftdrop[jetIdx[0]]')
+    a.Define('sublead_softdrop_mass','FatJet_msoftdrop[jetIdx[1]]')
     a.Define('norm',str(norm))
 
     # Book a group to save the histograms
     out = HistGroup("%s_%s"%(setname,year))
     for varname in varnames.keys():
         histname = '%s_%s_%s'%(setname,year,varname)
-        hist_tuple = (histname,histname,20,0,1) # Arguments for binning that you would normally pass to a TH1
+        # Arguments for binning that you would normally pass to a TH1
+        if "tau" in varname :
+	    hist_tuple = (histname,histname,20,0,1)
+	elif "Pt" in varname :
+	    hist_tuple = (histname,histname,30,400,1000)
+	elif "phi" in varname :
+	    hist_tuple = (histname,histname,30,-3.2,3.2)
+	elif "softdrop_mass" in varname :
+	    hist_tuple = (histname,histname,30,0,300)
         hist = a.GetActiveNode().DataFrame.Histo1D(hist_tuple,varname,'norm') # Project dataframe into a histogram (hist name/binning tuple, variable to plot from dataframe, weight)
         hist.GetValue() # This gets the actual TH1 instead of a pointer to the TH1
         out.Add(varname,hist) # Add it to our group
