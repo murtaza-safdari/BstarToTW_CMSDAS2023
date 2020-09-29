@@ -121,15 +121,16 @@ def select(setname,year):
     a.Define('sublead_tau32','FatJet_tau2[jetIdx[1]] > 0 ? FatJet_tau3[jetIdx[1]]/FatJet_tau2[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
     a.Define('lead_tau21','FatJet_tau1[jetIdx[0]] > 0 ? FatJet_tau2[jetIdx[0]]/FatJet_tau1[jetIdx[0]] : -1') # Conditional to make sure tau2 != 0 for division
     a.Define('sublead_tau21','FatJet_tau1[jetIdx[1]] > 0 ? FatJet_tau2[jetIdx[1]]/FatJet_tau1[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
-#    a.Define('nbjet_loose','Sum(Jet_btagDeepB > 0.2217)') # DeepCSV loose WP 2016
-#    a.Define('nbjet_medium','Sum(Jet_btagDeepB > 0.6321)') # DeepCSV medium WP 2016
-#    a.Define('nbjet_tight','Sum(Jet_btagDeepB > 0.8953)') # DeepCSV tight WP 2016
-#    a.Define('nbjet_loose','Sum(Jet_btagDeepB > 0.1522)') # DeepCSV loose WP 2017
-#    a.Define('nbjet_medium','Sum(Jet_btagDeepB > 0.4941)') # DeepCSV medium WP 2017
-#    a.Define('nbjet_tight','Sum(Jet_btagDeepB > 0.8001)') # DeepCSV tight WP 2017
-    a.Define('nbjet_loose','Sum(Jet_btagDeepB > 0.1241)') # DeepCSV loose WP 2018
-    a.Define('nbjet_medium','Sum(Jet_btagDeepB > 0.4184)') # DeepCSV medium WP 2018
-    a.Define('nbjet_tight','Sum(Jet_btagDeepB > 0.7571)') # DeepCSV tight WP 2018
+    bcut = []
+    if year == '16' :
+        bcut = [0.2217,0.6321,0.8953]
+    elif year == '17' :
+        bcut = [0.1522,0.4941,0.8001]
+    elif year == '18' :
+        bcut = [0.1241,0.4184,0.7571]
+    a.Define('nbjet_loose','Sum(Jet_btagDeepB > '+str(bcut[0])+')') # DeepCSV loose WP
+    a.Define('nbjet_medium','Sum(Jet_btagDeepB > '+str(bcut[1])+')') # DeepCSV medium WP
+    a.Define('nbjet_tight','Sum(Jet_btagDeepB > '+str(bcut[2])+')') # DeepCSV tight WP
     a.Define('norm',str(norm))
 
     # Book a group to save the histograms
