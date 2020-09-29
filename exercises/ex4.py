@@ -85,6 +85,9 @@ varnames = {
         'sublead_tau32':'#tau_{32}^{jet1}',
         'lead_tau21':'#tau_{21}^{jet0}',
         'sublead_tau21':'#tau_{21}^{jet1}',
+        'nbjet_loose':'loosebjets',
+        'nbjet_medium':'mediumbjets',
+        'nbjet_tight':'tightbjets',
         'lead_jetPt':'p_{T}^{jet0}',
         'sublead_jetPt':'p_{T}^{jet1}',
         'deltaphi':'#Delta#phi_{jet0,jet1}',
@@ -124,6 +127,16 @@ def select(setname,year):
     a.Define('sublead_tau32','FatJet_tau2[jetIdx[1]] > 0 ? FatJet_tau3[jetIdx[1]]/FatJet_tau2[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
     a.Define('lead_tau21','FatJet_tau1[jetIdx[0]] > 0 ? FatJet_tau2[jetIdx[0]]/FatJet_tau1[jetIdx[0]] : -1') # Conditional to make sure tau2 != 0 for division
     a.Define('sublead_tau21','FatJet_tau1[jetIdx[1]] > 0 ? FatJet_tau2[jetIdx[1]]/FatJet_tau1[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
+    bcut = []
+    if year == '16' :
+        bcut = [0.2217,0.6321,0.8953]
+    elif year == '17' :
+        bcut = [0.1522,0.4941,0.8001]
+    elif year == '18' :
+        bcut = [0.1241,0.4184,0.7571]
+    a.Define('nbjet_loose','Sum(Jet_btagDeepB > '+str(bcut[0])+')') # DeepCSV loose WP
+    a.Define('nbjet_medium','Sum(Jet_btagDeepB > '+str(bcut[1])+')') # DeepCSV medium WP
+    a.Define('nbjet_tight','Sum(Jet_btagDeepB > '+str(bcut[2])+')') # DeepCSV tight WP
     a.Define('lead_jetPt','FatJet_pt[jetIdx[0]]')
     a.Define('sublead_jetPt','FatJet_pt[jetIdx[1]]')
     a.Define('lead_softdrop_mass','FatJet_msoftdrop[jetIdx[0]]')
@@ -135,7 +148,9 @@ def select(setname,year):
     for varname in varnames.keys():
         histname = '%s_%s_%s'%(setname,year,varname)
         # Arguments for binning that you would normally pass to a TH1
-        if "tau" in varname :
+        if "nbjet" in varname :
+            hist_tuple = (histname,histname, 10,0,10)
+        elif "tau" in varname :
             hist_tuple = (histname,histname,20,0,1)
         elif "Pt" in varname :
             hist_tuple = (histname,histname,30,400,1000)
