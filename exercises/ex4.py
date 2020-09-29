@@ -84,7 +84,10 @@ varnames = {
         'lead_tau32':'#tau_{32}^{jet0}',
         'sublead_tau32':'#tau_{32}^{jet1}',
         'lead_tau21':'#tau_{21}^{jet0}',
-        'sublead_tau21':'#tau_{21}^{jet1}'
+        'sublead_tau21':'#tau_{21}^{jet1}',
+	'nbjet_loose':'loosebjets',
+	'nbjet_medium':'mediumbjets',
+	'nbjet_tight':'tightbjets',
     }
 
 
@@ -118,6 +121,15 @@ def select(setname,year):
     a.Define('sublead_tau32','FatJet_tau2[jetIdx[1]] > 0 ? FatJet_tau3[jetIdx[1]]/FatJet_tau2[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
     a.Define('lead_tau21','FatJet_tau1[jetIdx[0]] > 0 ? FatJet_tau2[jetIdx[0]]/FatJet_tau1[jetIdx[0]] : -1') # Conditional to make sure tau2 != 0 for division
     a.Define('sublead_tau21','FatJet_tau1[jetIdx[1]] > 0 ? FatJet_tau2[jetIdx[1]]/FatJet_tau1[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
+#    a.Define('nbjet_loose','Sum(Jet_btagDeepB > 0.2217)') # DeepCSV loose WP 2016
+#    a.Define('nbjet_medium','Sum(Jet_btagDeepB > 0.6321)') # DeepCSV medium WP 2016
+#    a.Define('nbjet_tight','Sum(Jet_btagDeepB > 0.8953)') # DeepCSV tight WP 2016
+#    a.Define('nbjet_loose','Sum(Jet_btagDeepB > 0.1522)') # DeepCSV loose WP 2017
+#    a.Define('nbjet_medium','Sum(Jet_btagDeepB > 0.4941)') # DeepCSV medium WP 2017
+#    a.Define('nbjet_tight','Sum(Jet_btagDeepB > 0.8001)') # DeepCSV tight WP 2017
+    a.Define('nbjet_loose','Sum(Jet_btagDeepB > 0.1241)') # DeepCSV loose WP 2018
+    a.Define('nbjet_medium','Sum(Jet_btagDeepB > 0.4184)') # DeepCSV medium WP 2018
+    a.Define('nbjet_tight','Sum(Jet_btagDeepB > 0.7571)') # DeepCSV tight WP 2018
     a.Define('norm',str(norm))
 
     # Book a group to save the histograms
@@ -125,6 +137,8 @@ def select(setname,year):
     for varname in varnames.keys():
         histname = '%s_%s_%s'%(setname,year,varname)
         hist_tuple = (histname,histname,20,0,1) # Arguments for binning that you would normally pass to a TH1
+	if "nbjet" in varname :
+            hist_tuple = (histname,histname, 10,0,10)
         hist = a.GetActiveNode().DataFrame.Histo1D(hist_tuple,varname,'norm') # Project dataframe into a histogram (hist name/binning tuple, variable to plot from dataframe, weight)
         hist.GetValue() # This gets the actual TH1 instead of a pointer to the TH1
         out.Add(varname,hist) # Add it to our group
