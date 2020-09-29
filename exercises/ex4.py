@@ -85,9 +85,9 @@ varnames = {
         'sublead_tau32':'#tau_{32}^{jet1}',
         'lead_tau21':'#tau_{21}^{jet0}',
         'sublead_tau21':'#tau_{21}^{jet1}',
-	'nbjet_loose':'loosebjets',
-	'nbjet_medium':'mediumbjets',
-	'nbjet_tight':'tightbjets',
+        'nbjet_loose':'loosebjets',
+        'nbjet_medium':'mediumbjets',
+        'nbjet_tight':'tightbjets',
     }
 
 
@@ -138,7 +138,7 @@ def select(setname,year):
     for varname in varnames.keys():
         histname = '%s_%s_%s'%(setname,year,varname)
         hist_tuple = (histname,histname,20,0,1) # Arguments for binning that you would normally pass to a TH1
-	if "nbjet" in varname :
+        if "nbjet" in varname :
             hist_tuple = (histname,histname, 10,0,10)
         hist = a.GetActiveNode().DataFrame.Histo1D(hist_tuple,varname,'norm') # Project dataframe into a histogram (hist name/binning tuple, variable to plot from dataframe, weight)
         hist.GetValue() # This gets the actual TH1 instead of a pointer to the TH1
