@@ -70,8 +70,8 @@ flags = ["Flag_goodVertices",
         "Flag_HBHENoiseFilter", 
         "Flag_HBHENoiseIsoFilter",
         "Flag_EcalDeadCellTriggerPrimitiveFilter",
-        "Flag_BadPFMuonFilter",
-        "Flag_ecalBadCalibReducedMINIAODFilter"
+        "Flag_BadPFMuonFilter"
+        #"Flag_ecalBadCalibReducedMINIAODFilter"  # Still work in progress flag, may not be used
     ]
 # Triggers
 if options.year == '16': 
@@ -88,6 +88,11 @@ varnames = {
         'nbjet_loose':'loosebjets',
         'nbjet_medium':'mediumbjets',
         'nbjet_tight':'tightbjets',
+        'lead_jetPt':'p_{T}^{jet0}',
+        'sublead_jetPt':'p_{T}^{jet1}',
+        'deltaphi':'#Delta#phi_{jet0,jet1}',
+        'lead_softdrop_mass':'m_{SD}^{jet0}',
+        'sublead_softdrop_mass':'m_{SD}^{jet1}',
     }
 
 
@@ -117,6 +122,7 @@ def select(setname,year):
     a.Cut('eta_cut','abs(FatJet_eta[jetIdx[0]]) < 2.4 && abs(FatJet_eta[jetIdx[1]]) < 2.4')
     a.Cut('mjet_cut','FatJet_msoftdrop[jetIdx[0]] > 50 && FatJet_msoftdrop[jetIdx[1]] > 50')
     a.Cut('mtw_cut','analyzer::invariantMass(jetIdx[0],jetIdx[1],FatJet_pt,FatJet_eta,FatJet_phi,FatJet_msoftdrop) > 1200')
+    a.Define('deltaphi','analyzer::deltaPhi(FatJet_phi[jetIdx[0]],FatJet_phi[jetIdx[1]])')
     a.Define('lead_tau32','FatJet_tau2[jetIdx[0]] > 0 ? FatJet_tau3[jetIdx[0]]/FatJet_tau2[jetIdx[0]] : -1') # Conditional to make sure tau2 != 0 for division
     a.Define('sublead_tau32','FatJet_tau2[jetIdx[1]] > 0 ? FatJet_tau3[jetIdx[1]]/FatJet_tau2[jetIdx[1]] : -1') # condition ? <do if true> : <do if false>
     a.Define('lead_tau21','FatJet_tau1[jetIdx[0]] > 0 ? FatJet_tau2[jetIdx[0]]/FatJet_tau1[jetIdx[0]] : -1') # Conditional to make sure tau2 != 0 for division
@@ -131,15 +137,27 @@ def select(setname,year):
     a.Define('nbjet_loose','Sum(Jet_btagDeepB > '+str(bcut[0])+')') # DeepCSV loose WP
     a.Define('nbjet_medium','Sum(Jet_btagDeepB > '+str(bcut[1])+')') # DeepCSV medium WP
     a.Define('nbjet_tight','Sum(Jet_btagDeepB > '+str(bcut[2])+')') # DeepCSV tight WP
+    a.Define('lead_jetPt','FatJet_pt[jetIdx[0]]')
+    a.Define('sublead_jetPt','FatJet_pt[jetIdx[1]]')
+    a.Define('lead_softdrop_mass','FatJet_msoftdrop[jetIdx[0]]')
+    a.Define('sublead_softdrop_mass','FatJet_msoftdrop[jetIdx[1]]')
     a.Define('norm',str(norm))
 
     # Book a group to save the histograms
     out = HistGroup("%s_%s"%(setname,year))
     for varname in varnames.keys():
         histname = '%s_%s_%s'%(setname,year,varname)
-        hist_tuple = (histname,histname,20,0,1) # Arguments for binning that you would normally pass to a TH1
+        # Arguments for binning that you would normally pass to a TH1
         if "nbjet" in varname :
             hist_tuple = (histname,histname, 10,0,10)
+        elif "tau" in varname :
+            hist_tuple = (histname,histname,20,0,1)
+        elif "Pt" in varname :
+            hist_tuple = (histname,histname,30,400,1000)
+        elif "phi" in varname :
+            hist_tuple = (histname,histname,30,-3.2,3.2)
+        elif "softdrop_mass" in varname :
+            hist_tuple = (histname,histname,30,0,300)
         hist = a.GetActiveNode().DataFrame.Histo1D(hist_tuple,varname,'norm') # Project dataframe into a histogram (hist name/binning tuple, variable to plot from dataframe, weight)
         hist.GetValue() # This gets the actual TH1 instead of a pointer to the TH1
         out.Add(varname,hist) # Add it to our group
