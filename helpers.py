@@ -1,11 +1,10 @@
-from TIMBER.Tools.Common import openJSON
-from TIMBER.Tools import CMS_lumi 
+from TIMBER.Tools.Common import OpenJSON
 import math, ROOT, collections
 from collections import OrderedDict
 
 def getNormFactor(setname,year,configPath,genEventCount):
     # Config loading - will have cuts, xsec, and lumi
-    if isinstance(configPath,str): config = openJSON(configPath)
+    if isinstance(configPath,str): config = OpenJSON(configPath)
     else: config = configPath
     cuts = config['CUTS'][year]
     lumi = config['lumi']

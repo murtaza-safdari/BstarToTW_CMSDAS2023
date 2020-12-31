@@ -1,9 +1,11 @@
-#include <math.h>
-#include <tuple>
-#include "Framework/common.h"
+#define _USE_MATH_DEFINES
 
-using namespace ROOT::VecOps;
-using namespace analyzer;
+#include <cmath>
+#include <tuple>
+#include "ROOT/RVec.hxx"
+
+//using namespace analyzer;
+//namespace analyzer {
 /**
     Checks for jets in opposite hemispheres (of phi) that also pass a jetId. 
     Can optionally provide an index that reorders the jets if jet energy
@@ -35,7 +37,7 @@ RVec<int> hemispherize(RVec<float> jet_phi, RVec<int> jet_jetId, RVec<int> index
         highestPtIdx = LoopIndex[0];
         thisIdx = LoopIndex[i];
 
-        if (abs(analyzer::deltaPhi(jet_phi[highestPtIdx],jet_phi[thisIdx])) > M_PI/2.0) {
+        if (abs(ROOT::VecOps::DeltaPhi(jet_phi[highestPtIdx],jet_phi[thisIdx])) > M_PI/2.0) {
             if ( (jet_jetId[thisIdx] & 1) == 0 ){
                 if ( (jet_jetId[thisIdx] & 2) == 0 ) {                  
                 } else {
@@ -105,3 +107,4 @@ const RVec<int> UnpackHEMpt(std::tuple<RVec<int>, RVec<float>> HEMstuff) {
 const RVec<int> UnpackHEMidx(std::tuple<RVec<int>, RVec<float>> HEMstuff) {
     return std::get<0>(HEMstuff);
 }
+
