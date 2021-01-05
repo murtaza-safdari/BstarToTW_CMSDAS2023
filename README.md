@@ -1,8 +1,8 @@
-# BstarToTW_CMSDAS2020
+# BstarToTW_CMSDAS2021
 
 ## Getting started (in bash shell)
 
-Setup CMSSW environment:
+### Setup CMSSW environment:
 ```
 ssh -XY USERNAME@cmslpc-sl7.fnal.gov
 source /cvmfs/cms.cern.ch/cmsset_default.sh 
@@ -12,15 +12,21 @@ mkdir b2g_exercise/
 cd b2g_exercise/
 cmsrel CMSSW_11_0_1
 cd CMSSW_11_0_1/src
-cmsenv
 ```
 
-Clone repo:
+### Clone repo:
 ```
-git clone https://github.com/cmantill/BstarToTW_CMSDAS2020
+git clone https://github.com/cmantill/BstarToTW_CMSDAS2021
+```
+OR fork the code onto your personal project space and set the upstream:
+```
+git clone https://github.com/<GitHubUsername>/BstarToTW_CMSDAS2021
+cd BstarToTW_CMSDAS2021
+git remote add upstream https://github.com/cmantill/BstarToTW_CMSDAS2021
+git remote -v
 ```
 
-Create TIMBER environement and setup cmsenv (for first time):
+### Create environment
 ```
 python -m virtualenv timber-env
 source timber-env/bin/activate
@@ -37,22 +43,7 @@ Once you have an environment:
 ```
 cd ~/nobackup/b2g_exercise/CMSSW_11_0_1/src/
 source timber-env/bin/activate
-cd BstarToTW_CMSDAS2020/
+cd BstarToTW_CMSDAS2021/
+source /cvmfs/cms.cern.ch/cmsset_default.sh 
+cmsenv
 ```
-
-## Exercise 1: Object and event selection
-
-
-`python exercises/selection -y 16 --select`
-
-## Exercise 2: Define analysis signal region
-
-## Exercise 3: Define control regions
-
-## Exercise 4: Background estimate
-
-## Exercise 5: Systematics 
-
-## Exercise 6: Limit setting
-
-## Exercise 7: Extra - optimization
