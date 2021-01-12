@@ -41,22 +41,13 @@ python -c 'import TIMBER.Analyzer'
 
 Once you have an environment:
 ```
-cd CMSSW_11_0_1/src
+cd CMSSW_11_0_1/src/
 cmsenv
-source timber-env/bin/activate
-```
-
-Sometimes the environment doesn't work (if you have set cmsenv before), in that case we recommend:
-```
-cd ~/nobackup/b2g_exercise/CMSSW_11_0_1/src/
-rm -rf timber-env
-cmsenv
-virtualenv timber-env
 source timber-env/bin/activate
 cd TIMBER/
 git fetch --all
 git checkout master
-source setup.sh
+python setup.py install
 cd ../BstarToTW_CMSDAS2020
 git fetch --all
 git pull origin master
