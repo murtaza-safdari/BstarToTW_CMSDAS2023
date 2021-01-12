@@ -184,6 +184,6 @@ if __name__ == "__main__":
 
         # Plot everything together!
         # Using TIMBER's functionaly of Plotting https://github.com/lcorcodilos/TIMBER/blob/master/TIMBER/Tools/Plot.py#L293
-        EasyPlots(plot_filename, signal_hists, colors=[2], ytitle='Events', datastyle='hist')
-
-        
+        #EasyPlots(plot_filename, signal_hists, colors=[2], ytitle='Events', datastyle='hist')
+        # This one is more pretty: https://github.com/lcorcodilos/TIMBER/blob/master/TIMBER/Tools/Plot.py#L10
+        CompareShapes(plot_filename, options.year, varnames[varname], bkgs={}, signals=signal_hists,scale=True,stackBkg=False,doSoverB=False)
