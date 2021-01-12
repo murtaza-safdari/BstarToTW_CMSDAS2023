@@ -27,9 +27,10 @@ parser.add_option('--select', metavar='BOOL', action='store_true',
 ###########################################
 # Establish some global variables for use #
 ###########################################
-eoslpcuser = '/eos/uscms/store/user/%s/B2GBstarTW/plots'%(os.environ['USER']) # this is where we'll save your plots 
-if not os.path.exists(eoslpcuser):
-    os.makedirs(eoslpcuser)
+plotdir = 'plots/' # this is where we'll save your plots                                                                                                                                                 
+if not os.path.exists(plotdir):
+    os.makedirs(plotdir)
+
 ## TODO: change to cmsdas and use root://..
 #rootfile_path = 'root://cmseos.fnal.gov//store/user/lcorcodi/bstar_nano/rootfiles/'
 rootfile_path = '/eos/uscms/store/user/lcorcodi/bstar_nano/rootfiles/'
@@ -215,7 +216,7 @@ if __name__ == "__main__":
 
     # For each variable to plot...
     for varname in varnames.keys():
-        plot_filename = eoslpcuser+'/%s_%s.png'%(varname,options.year)
+        plot_filename = plotdir+'/%s_%s.png'%(varname,options.year)
 
         # Setup ordered dictionaries so processes plot in the order we specify
         bkg_hists,signal_hists = OrderedDict(),OrderedDict()
