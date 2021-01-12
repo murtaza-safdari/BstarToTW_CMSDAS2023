@@ -27,12 +27,15 @@ parser.add_option('--select', metavar='BOOL', action='store_true',
 ###########################################
 # Establish some global variables for use #
 ###########################################
-cernbox = '/eos/home-%s/%s/Documents/plots'%(os.environ['USER'][0],os.environ['USER']) # this is where we'll save your plots (accessible via web on cernbox.cern.ch)
-if not os.path.exists(cernbox):
-    os.makedirs(cernbox)
-rootfile_path = '/eos/user/c/cmsdas/long-exercises/bstarToTW/rootfiles/'
+plotdir = 'plots/' # this is where we'll save your plots                                                                                                                                                 
+if not os.path.exists(plotdir):
+    os.makedirs(plotdir)
+
+rootfile_path = '/eos/uscms/store/user/lcorcodi/bstar_nano/rootfiles/'
 config = openJSON('bstar_config.json')
 cuts = config['CUTS'][options.year]
+
+CompileCpp("TIMBER/Framework/include/common.h")
 CompileCpp('bstar.cc') # has the c++ functions we need when looping of the RDataFrame
 
 # Sets we want to process and some nice naming for our plots
@@ -212,7 +215,7 @@ if __name__ == "__main__":
     # For each variable to plot...
     for varname in varnames:
         if varname == 'deltaY': continue # deltaY optimization requires cuts on mtw to make sense so skipping
-        plot_filename = cernbox+'/%s_%s_Nminus1.png'%(varname,options.year)
+        plot_filename = plotdir+'/%s_%s_Nminus1.png'%(varname,options.year)
 
         # Setup ordered dictionaries so processes plot in the order we specify
         bkg_hists,signal_hists = OrderedDict(),OrderedDict()

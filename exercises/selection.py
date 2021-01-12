@@ -176,6 +176,8 @@ def select(setname,year):
             hist_tuple = (histname,histname,30,-3.2,3.2)
         elif "softdrop_mass" in varname :
             hist_tuple = (histname,histname,30,0,300)
+        else:
+            hist_tuple = (histname,histname,20,0,1)
         hist = a.GetActiveNode().DataFrame.Histo1D(hist_tuple,varname,'norm') # Project dataframe into a histogram (hist name/binning tuple, variable to plot from dataframe, weight)
         hist.GetValue() # This gets the actual TH1 instead of a pointer to the TH1
         out.Add(varname,hist) # Add it to our group
