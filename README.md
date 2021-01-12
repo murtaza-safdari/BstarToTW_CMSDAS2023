@@ -47,3 +47,20 @@ cd BstarToTW_CMSDAS2021/
 source /cvmfs/cms.cern.ch/cmsset_default.sh 
 cmsenv
 ```
+
+Sometimes the environment doesn't work (if you have set cmsenv before), in that case we recommend:
+```
+cd ~/nobackup/b2g_exercise/CMSSW_11_0_1/src/
+rm -rf timber-env
+cmsenv
+virtualenv timber-env
+source timber-env/bin/activate
+cd TIMBER/
+git fetch --all
+git checkout master
+python setup.py install
+source setup.sh
+cd ../BstarToTW_CMSDAS2020
+git fetch --all
+git pull origin master
+```
