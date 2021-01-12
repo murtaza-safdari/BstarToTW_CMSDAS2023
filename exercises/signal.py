@@ -179,8 +179,10 @@ if __name__ == "__main__":
         plot_filename = plotdir+'/%s_%s.png'%(varname,options.year)
 
         # Setup ordered dictionaries so processes plot in the order we specify
-        signal_hists = []
-        for sig in signal_names: signal_hists.append(histgroups[sig][varname])
+        #signal_hists = []
+        #for sig in signal_names: signal_hists.append(histgroups[sig][varname])
+        signal_hists = OrderedDict()
+        for sig in signal_names: signal_hists[sig] = histgroups[sig][varname]
 
         # Plot everything together!
         # Using TIMBER's functionaly of Plotting https://github.com/lcorcodilos/TIMBER/blob/master/TIMBER/Tools/Plot.py#L293
