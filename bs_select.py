@@ -75,7 +75,7 @@ def run(args):
 
     # Determine normalization weight
     if not a.isData: 
-        norm = (xsec*lumi)/config['NEVENTS'][args.year][setname.split('_')[0]]
+        norm = (xsec*lumi)/config['NEVENTS'][args.year]['_'.join(setname.split('_')[:-1])]
     else: 
         norm = 1.
 
