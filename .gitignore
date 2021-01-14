@@ -4,3 +4,6 @@
 *.pyc
 *~
 *.dot
+*.tgz
+*.log
+docker_stderror
