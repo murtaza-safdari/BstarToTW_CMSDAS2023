@@ -77,5 +77,5 @@ python CondorHelper.py -r condor/run_bstar.sh -a 2016_args.txt  -i "bs_select.py
 
 Check jobs:
 ```
-condor_q
+condor_q $USER
 ```
