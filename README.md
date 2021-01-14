@@ -60,7 +60,7 @@ Testing one
 python CondorHelper.py -r condor/run_bstar.sh -a test_args.txt -i "bs_select.py bstar.cc bstar_config.json helpers.py"
 ```
 
-For 2016:
+For 2016 (then change args file for other years):
 ```
-python CondorHelper.py -r condor/run_bstar.sh -a all_args.txt  -i "bs_select.py bstar.cc bstar_config.json helpers.py"
+python CondorHelper.py -r condor/run_bstar.sh -a 2016_args.txt  -i "bs_select.py bstar.cc bstar_config.json helpers.py"
 ```
