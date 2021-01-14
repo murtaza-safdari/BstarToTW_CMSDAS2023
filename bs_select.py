@@ -117,7 +117,7 @@ def run(args):
     tagging_vars.Add("subjet_btag", "top_index > -1 ? max(SubJet_btagDeepB[FatJet_subJetIdx1[top_index]],SubJet_btagDeepB[FatJet_subJetIdx2[top_index]]) : -1")
     tagging_vars.Add("tau21",       "w_index   > -1 ? FatJet_tau2[w_index]/FatJet_tau1[w_index]: -1")
     tagging_vars.Add("deepAK8_MD_TvsQCD", "top_index > -1 ? FatJet_deepTagMD_TvsQCD[top_index] : -1")
-    tagging_vars.Add("deepAK8_MD_WvsQCD", "top_index > -1 ? FatJet_deepTagMD_WvsQCD[w_index] : -1")
+    tagging_vars.Add("deepAK8_MD_WvsQCD", "w_index > -1 ? FatJet_deepTagMD_WvsQCD[w_index] : -1")
 
     toptag_str = "TopTag(tau32,0,{0}, subjet_btag,{1},1, mtop,50,1000)==1".format(cuts['tau32'],cuts['sjbtag'])
     if args.deep:
