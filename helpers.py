@@ -1,6 +1,7 @@
 from TIMBER.Tools.Common import OpenJSON
 import math, ROOT, collections
 from collections import OrderedDict
+from TIMBER.Tools.CMS import CMS_lumi
 
 def getNormFactor(setname,year,configPath,genEventCount):
     # Config loading - will have cuts, xsec, and lumi

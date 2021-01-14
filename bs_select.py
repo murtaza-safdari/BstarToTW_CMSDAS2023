@@ -63,6 +63,7 @@ else:
     triggers = ["HLT_PFHT1050","HLT_PFJet500","HLT_AK8PFJet380_TrimMass30","HLT_AK8PFJet400_TrimMass30"]
 
 # Compile some C++ modules for use
+CompileCpp("TIMBER/Framework/include/common.h")
 CompileCpp('bstar.cc') # custom .cc script
 
 ###########################
@@ -73,7 +74,7 @@ def run(options):
     a = analyzer(options.input)
 
     # Config loading - will have cuts, xsec, and lumi
-    config = openJSON(options.config)
+    config = OpenJSON(options.config)
     cuts = config['CUTS'][options.year]
     xsec, lumi = 1., 1.
     if setname in config['XSECS'].keys() and not a.isData: 
@@ -110,10 +111,10 @@ def run(options):
     jets.Add('top_index',   'top_bit >= 0 ? jetIdx[top_bit] : -1')
     jets.Add('w_index',     'top_index == 0 ? jetIdx[1] : top_index == 1 ? jetIdx[0] : -1')
     # Calculate some new comlumns that we'd like to cut on (that were costly to do before the other filtering)
-    jets.Add("lead_vect",   "analyzer::TLvector(FatJet_pt[jetIdx[0]],FatJet_eta[jetIdx[0]],FatJet_phi[jetIdx[0]],FatJet_msoftdrop[jetIdx[0]])")
-    jets.Add("sublead_vect","analyzer::TLvector(FatJet_pt[jetIdx[1]],FatJet_eta[jetIdx[1]],FatJet_phi[jetIdx[1]],FatJet_msoftdrop[jetIdx[1]])")
+    jets.Add("lead_vect",   "hardware::TLvector(FatJet_pt[jetIdx[0]],FatJet_eta[jetIdx[0]],FatJet_phi[jetIdx[0]],FatJet_msoftdrop[jetIdx[0]])")
+    jets.Add("sublead_vect","hardware::TLvector(FatJet_pt[jetIdx[1]],FatJet_eta[jetIdx[1]],FatJet_phi[jetIdx[1]],FatJet_msoftdrop[jetIdx[1]])")
     jets.Add("deltaY",      "lead_vect.Rapidity()-sublead_vect.Rapidity()")
-    jets.Add("mtw",         "analyzer::invariantMass(lead_vect,sublead_vect)")
+    jets.Add("mtw",         "hardware::invariantMass({lead_vect,sublead_vect})")
 
     # W and top
     tagging_vars = VarGroup('tagging_vars') 
