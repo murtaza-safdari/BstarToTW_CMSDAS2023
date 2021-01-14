@@ -55,7 +55,7 @@ git pull origin master
 
 ## Submitting jobs
 
-Modify username in `condor/run_bstar.sh` e.g.:
+Modify username and output directory in `condor/run_bstar.sh` e.g.:
 ```
 root://cmseos.fnal.gov//store/user/cmantill/bstar_select_tau21/
 ```
