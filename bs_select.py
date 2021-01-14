@@ -21,7 +21,8 @@ from TIMBER.Analyzer import *
 from TIMBER.Tools.Common import *
 # Other
 import argparse
-import time
+import time, sys
+sys.path.append('../TIMBER/')
 
 parser = argparse.ArgumentParser()
 
@@ -74,7 +75,7 @@ def run(args):
 
     # Determine normalization weight
     if not a.isData: 
-        norm = (xsec*lumi)/a.genEventCount
+        norm = (xsec*lumi)/config['NEVENTS'][args.year][setname.split('_')[0]]
     else: 
         norm = 1.
 

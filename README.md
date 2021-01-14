@@ -55,6 +55,11 @@ git pull origin master
 
 ## Submitting jobs
 
+Modify username in `condor/run_bstar.sh` e.g.:
+```
+root://cmseos.fnal.gov//store/user/cmantill/bstar_select_tau21/
+```
+
 Testing one
 ```
 python CondorHelper.py -r condor/run_bstar.sh -a test_args.txt -i "bs_select.py bstar.cc bstar_config.json helpers.py"
@@ -63,4 +68,9 @@ python CondorHelper.py -r condor/run_bstar.sh -a test_args.txt -i "bs_select.py 
 For 2016 (then change args file for other years):
 ```
 python CondorHelper.py -r condor/run_bstar.sh -a 2016_args.txt  -i "bs_select.py bstar.cc bstar_config.json helpers.py"
+```
+
+Check jobs
+```
+condor_q
 ```

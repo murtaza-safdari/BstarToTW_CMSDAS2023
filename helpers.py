@@ -3,12 +3,13 @@ import math, ROOT, collections
 from collections import OrderedDict
 from TIMBER.Tools.CMS import CMS_lumi
 
-def getNormFactor(setname,year,configPath,genEventCount):
+def getNormFactor(setname,year,configPath):
     # Config loading - will have cuts, xsec, and lumi
     if isinstance(configPath,str): config = OpenJSON(configPath)
     else: config = configPath
     cuts = config['CUTS'][year]
     lumi = config['lumi'+str(year)]
+    geneEventCount = config['NEVENTS'][str(year)]
 
     # Deal with unique ttbar cases
     if setname == 'ttbar' and year == '16':
