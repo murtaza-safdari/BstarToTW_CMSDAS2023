@@ -84,9 +84,9 @@ int WtagDeepAK8(float deepAK8W_val, float deepAK8W_min, float deepAK8W_max, floa
     } else {return 0;}
 }
 
-int TopTagDeepAK8(float deepAK8top_val, float deepAK8top_min, float deepAK8top_max, float subjetbtag_val, float subjetbtag_min, float subjetbtag_max, float mass_val, float mass_min, float mass_max) {
+int TopTagDeepAK8(float deepAK8top_val, float deepAK8top_min, float deepAK8top_max, float mass_val, float mass_min, float mass_max) {
     // If mass is non-zero check for the mass cut
-    if ( (deepAK8top_min < deepAK8top_val) && (deepAK8top_val < deepAK8top_max) && (subjetbtag_min < subjetbtag_val) && (subjetbtag_val < subjetbtag_max) && (mass_min < mass_val) && (mass_val < mass_max) ) {
+    if ( (deepAK8top_min < deepAK8top_val) && (deepAK8top_val < deepAK8top_max) && (mass_min < mass_val) && (mass_val < mass_max) ) {
       return 1;
     } else {return 0;}
 }

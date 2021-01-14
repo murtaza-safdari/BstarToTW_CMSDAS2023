@@ -122,7 +122,7 @@ def run(args):
 
     toptag_str = "TopTag(tau32,0,{0}, subjet_btag,{1},1, mtop,50,1000)==1".format(cuts['tau32'],cuts['sjbtag'])
     if args.deep:
-        toptag_str = "TopTagDeepAK8(deepAK8_MD_TvsQCD,{0},1, subjet_btag,{1},1, mtop,50,1000)==1".format(cuts['deepAK8top'],cuts['sjbtag']) 
+        toptag_str = "TopTagDeepAK8(deepAK8_MD_TvsQCD,{0},1, mtop,50,1000)==1".format(cuts['deepAK8top']) 
     tagging_vars.Add("wtag",'wtag_bit>0')
     tagging_vars.Add("top_tag",toptag_str)
  
