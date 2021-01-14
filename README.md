@@ -57,14 +57,15 @@ git pull origin master
 
 Modify username and output directory in `condor/run_bstar.sh` e.g.:
 ```
-root://cmseos.fnal.gov//store/user/cmantill/bstar_select_tau21/
+root://cmseos.fnal.gov//store/user/$USER/bstar_select_tau21/
 ```
 
+also create the directory:
 ```
 eosmkdir /store/user/$USER/bstar_select_tau21
 ```
 
-Testing one
+Test it works on one file:
 ```
 python CondorHelper.py -r condor/run_bstar.sh -a test_args.txt -i "bs_select.py bstar.cc bstar_config.json helpers.py"
 ```
@@ -74,7 +75,7 @@ For 2016 (then change args file for other years):
 python CondorHelper.py -r condor/run_bstar.sh -a 2016_args.txt  -i "bs_select.py bstar.cc bstar_config.json helpers.py"
 ```
 
-Check jobs
+Check jobs:
 ```
 condor_q
 ```
