@@ -60,6 +60,10 @@ Modify username in `condor/run_bstar.sh` e.g.:
 root://cmseos.fnal.gov//store/user/cmantill/bstar_select_tau21/
 ```
 
+```
+eosmkdir /store/user/$USER/bstar_select_tau21
+```
+
 Testing one
 ```
 python CondorHelper.py -r condor/run_bstar.sh -a test_args.txt -i "bs_select.py bstar.cc bstar_config.json helpers.py"

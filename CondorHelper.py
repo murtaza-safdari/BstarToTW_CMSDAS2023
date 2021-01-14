@@ -29,9 +29,8 @@ print(options.args)
 if options.inputs != '':
     commands.append("tar czvf tarball.tgz "+options.inputs)
 
-import os
-os.sys('mkdir -p condor/logs/')
-os.sys('mkdir -p logs/')
+commands.append('mkdir -p condor/logs/')
+commands.append('mkdir -p logs/')
 
 # Make JDL from template
 timestr = time.strftime("%Y%m%d-%H%M%S")
