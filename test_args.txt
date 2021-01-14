@@ -1,0 +1,1 @@
+-i root://cmsxrootd.fnal.gov//store/user/cmsdas/2021/long_exercises/BstarTW/rootfiles/signalLH1200_bstar16.root -y 16
