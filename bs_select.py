@@ -20,31 +20,22 @@ import sys
 from TIMBER.Analyzer import *
 from TIMBER.Tools.Common import *
 # Other
-from optparse import OptionParser
+import argparse
 import time
 
-parser = OptionParser()
+parser = argparse.ArgumentParser()
 
-parser.add_option('-i', '--input', metavar='FILE', type='string', action='store',
-                default   =   '',
-                dest      =   'input',
-                help      =   'A root file or text file with multiple root file locations to analyze')
-parser.add_option('-y', '--year', metavar='FILE', type='string', action='store',
-                default   =   '',
-                dest      =   'year',
-                help      =   'Year')
-parser.add_option('-c', '--config', metavar='FILE', type='string', action='store',
-                default   =   'bstar_config.json',
-                dest      =   'config',
-                help      =   'Configuration file in json format with xsecs, cuts, etc that is interpreted as a python dictionary')
-
-(options, args) = parser.parse_args()
+parser.add_argument('-i', '--input', type=str, action='store', default='', dest='input', help='A root file or text file with multiple root file locations to analyze') 
+parser.add_argument('-y', '--year',  type=str, action='store', default='', dest='year', help='Year')
+parser.add_argument('-c', '--config', type=str, action='store', default='bstar_config.json', dest='config', help='Configuration file in json format with xsecs, cuts, etc that is interpreted as a python dictionary') 
+parser.add_argument('--deep', default=False, action='store_true',help='DeepAK8 selection')
+args = parser.parse_args()
 
 ###########################################
 # Set some global variables for later use #
 ###########################################
 # Deduce set name from input file
-setname = options.input.replace('.root','').split('/')[-1]
+setname = args.input.replace('.root','').split('/')[-1]
 
 # Flags - https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
 flags = ["Flag_goodVertices",
@@ -57,24 +48,25 @@ flags = ["Flag_goodVertices",
     ]
 
 # Triggers
-if options.year == '16': 
+if args.year == '16': 
     triggers = ["HLT_PFHT800","HLT_PFHT900","HLT_PFJet450"]
 else: 
     triggers = ["HLT_PFHT1050","HLT_PFJet500","HLT_AK8PFJet380_TrimMass30","HLT_AK8PFJet400_TrimMass30"]
 
 # Compile some C++ modules for use
+CompileCpp("TIMBER/Framework/include/common.h")
 CompileCpp('bstar.cc') # custom .cc script
 
 ###########################
 # Run analyzer on file(s) #
 ###########################
-def run(options):
+def run(args):
     ROOT.ROOT.EnableImplicitMT(4)
-    a = analyzer(options.input)
+    a = analyzer(args.input)
 
     # Config loading - will have cuts, xsec, and lumi
-    config = openJSON(options.config)
-    cuts = config['CUTS'][options.year]
+    config = OpenJSON(args.config)
+    cuts = config['CUTS'][args.year]
     xsec, lumi = 1., 1.
     if setname in config['XSECS'].keys() and not a.isData: 
         xsec = config['XSECS'][setname]
@@ -103,17 +95,19 @@ def run(options):
     # Wtagging decision logic
     # This statement returns 0 for no tag, 1 for lead tag, 2 for sublead tag, and 3 for both tag (which is equivalent to 2 for the sake of deciding what is the W)
     wtag_str = "1*Wtag(FatJet_tau2[jetIdx[0]]/FatJet_tau1[jetIdx[0]],0,{0}, FatJet_msoftdrop[jetIdx[0]],65,105) + 2*Wtag(FatJet_tau2[jetIdx[1]]/FatJet_tau1[jetIdx[1]],0,{0}, FatJet_msoftdrop[jetIdx[1]],65,105)".format(cuts['tau21'])
+    if args.deep:
+        wtag_str = "1*WtagDeepAK8(FatJet_deepTagMD_WvsQCD[jetIdx[0]],{0},1, FatJet_msoftdrop[jetIdx[0]],65,105) + 2*Wtag(FatJet_deepTagMD_WvsQCD[jetIdx[0]],{0},1, FatJet_msoftdrop[jetIdx[1]],65,105)".format(cuts['deepAK8w'])
 
     jets = VarGroup('jets')
     jets.Add('wtag_bit',    wtag_str)
     jets.Add('top_bit',     '(wtag_bit & 2)? 0: (wtag_bit & 1)? 1: -1') # (if wtag==3 or 2 (subleading w), top_index=0) else (if wtag==1, top_index=1) else (-1)
     jets.Add('top_index',   'top_bit >= 0 ? jetIdx[top_bit] : -1')
     jets.Add('w_index',     'top_index == 0 ? jetIdx[1] : top_index == 1 ? jetIdx[0] : -1')
-    # Calculate some new comlumns that we'd like to cut on (that were costly to do before the other filtering)
-    jets.Add("lead_vect",   "analyzer::TLvector(FatJet_pt[jetIdx[0]],FatJet_eta[jetIdx[0]],FatJet_phi[jetIdx[0]],FatJet_msoftdrop[jetIdx[0]])")
-    jets.Add("sublead_vect","analyzer::TLvector(FatJet_pt[jetIdx[1]],FatJet_eta[jetIdx[1]],FatJet_phi[jetIdx[1]],FatJet_msoftdrop[jetIdx[1]])")
+    # Calculate some new columns that we'd like to cut on (that were costly to do before the other filtering)
+    jets.Add("lead_vect",   "hardware::TLvector(FatJet_pt[jetIdx[0]],FatJet_eta[jetIdx[0]],FatJet_phi[jetIdx[0]],FatJet_msoftdrop[jetIdx[0]])")
+    jets.Add("sublead_vect","hardware::TLvector(FatJet_pt[jetIdx[1]],FatJet_eta[jetIdx[1]],FatJet_phi[jetIdx[1]],FatJet_msoftdrop[jetIdx[1]])")
     jets.Add("deltaY",      "lead_vect.Rapidity()-sublead_vect.Rapidity()")
-    jets.Add("mtw",         "analyzer::invariantMass(lead_vect,sublead_vect)")
+    jets.Add("mtw",         "hardware::invariantMass({lead_vect,sublead_vect})")
 
     # W and top
     tagging_vars = VarGroup('tagging_vars') 
@@ -122,7 +116,12 @@ def run(options):
     tagging_vars.Add("tau32",       "top_index > -1 ? FatJet_tau3[top_index]/FatJet_tau2[top_index]: -1")
     tagging_vars.Add("subjet_btag", "top_index > -1 ? max(SubJet_btagDeepB[FatJet_subJetIdx1[top_index]],SubJet_btagDeepB[FatJet_subJetIdx2[top_index]]) : -1")
     tagging_vars.Add("tau21",       "w_index   > -1 ? FatJet_tau2[w_index]/FatJet_tau1[w_index]: -1")
+    tagging_vars.Add("deepAK8_MD_TvsQCD", "top_index > -1 ? FatJet_deepTagMD_TvsQCD[top_index] : -1")
+    tagging_vars.Add("deepAK8_MD_WvsQCD", "top_index > -1 ? FatJet_deepTagMD_WvsQCD[w_index] : -1")
+
     toptag_str = "TopTag(tau32,0,{0}, subjet_btag,{1},1, mtop,50,1000)==1".format(cuts['tau32'],cuts['sjbtag'])
+    if args.deep:
+        toptag_str = "TopTagDeepAK8(deepAK8_MD_TvsQCD,{0},1, subjet_btag,{1},1, mtop,50,1000)==1".format(cuts['deepAK8top'],cuts['sjbtag']) 
     tagging_vars.Add("wtag",'wtag_bit>0')
     tagging_vars.Add("top_tag",toptag_str)
  
@@ -150,6 +149,6 @@ def run(options):
 
 if __name__ == "__main__":
     start_time = time.time()
-    run(options)
+    run(args)
 
     print ("Total time: "+str((time.time()-start_time)/60.) + ' min')

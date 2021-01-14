@@ -78,6 +78,19 @@ int TopTag(float tau32_val, float tau32_min, float tau32_max, float subjetbtag_v
     } else {return 0;}
 }
 
+int WtagDeepAK8(float deepAK8W_val, float deepAK8W_min, float deepAK8W_max, float mass_val, float mass_min, float mass_max) {
+    if ( (deepAK8W_min < deepAK8W_val) && (deepAK8W_val < deepAK8W_max) && (mass_min < mass_val) && (mass_val < mass_max) ) {
+      return 1;
+    } else {return 0;}
+}
+
+int TopTagDeepAK8(float deepAK8top_val, float deepAK8top_min, float deepAK8top_max, float subjetbtag_val, float subjetbtag_min, float subjetbtag_max, float mass_val, float mass_min, float mass_max) {
+    // If mass is non-zero check for the mass cut
+    if ( (deepAK8top_min < deepAK8top_val) && (deepAK8top_val < deepAK8top_max) && (subjetbtag_min < subjetbtag_val) && (subjetbtag_val < subjetbtag_max) && (mass_min < mass_val) && (mass_val < mass_max) ) {
+      return 1;
+    } else {return 0;}
+}
+
 const std::tuple<RVec<int>, RVec<float>> HEMreweight(RVec<float> FatJet_phi, RVec<float> FatJet_eta, RVec<float> FatJet_pt){
     int nFatJets = FatJet_phi.size();
 
