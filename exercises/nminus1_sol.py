@@ -42,9 +42,9 @@ CompileCpp('bstar.cc') # has the c++ functions we need when looping of the RData
 
 # Sets we want to process and some nice naming for our plots
 signal_names = ['signalLH%s'%(mass) for mass in [2000]]#range(1400,4200,600)]
-#bkg_names = ['singletop_tW', 'singletop_tWB', 'ttbar', 'QCDHT700', 'QCDHT1000', 'QCDHT1500', 'QCDHT2000'] # Everything
+bkg_names = ['singletop_tW', 'singletop_tWB', 'ttbar', 'QCDHT700', 'QCDHT1000', 'QCDHT1500', 'QCDHT2000'] # Everything
 #bkg_names = ['singletop_tW','singletop_tWB'] #Alberto
-bkg_names = ['QCDHT1500']
+#bkg_names = ['QCDHT1500']
 #bkg_names = ['singletop_tW','singletop_tWB','ttbar','QCD']
 
 names = {
@@ -206,7 +206,7 @@ def select(setname,year):
         hist.GetValue()
         nminus1Hists.Add(var,hist)    
 		
-    a.PrintNodeTree('my_exercises/nminus1_tree.dot')
+    #a.PrintNodeTree('my_exercises/nminus1_tree.dot')
     
     # Return the group
     return nminus1Hists

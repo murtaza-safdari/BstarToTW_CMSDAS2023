@@ -8,7 +8,7 @@ from optparse import OptionParser
 from collections import OrderedDict
 
 from TIMBER.Analyzer import analyzer, HistGroup, VarGroup, CutGroup
-from TIMBER.Tools.Common import CompileCpp, openJSON
+from TIMBER.Tools.Common import CompileCpp, OpenJSON
 from TIMBER.Tools.Plot import *
 import helpers
 
@@ -34,7 +34,7 @@ if not os.path.exists(plotdir):
     os.makedirs(plotdir)
 
 rootfile_path = 'root://cmsxrootd.fnal.gov///store/user/cmsdas/2021/long_exercises/BstarTW/rootfiles'
-config = openJSON('bstar_config.json')
+config = OpenJSON('bstar_config.json')
 cuts = config['CUTS'][options.year]
 
 CompileCpp("TIMBER/Framework/include/common.h")
