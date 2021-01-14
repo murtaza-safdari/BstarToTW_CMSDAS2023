@@ -103,7 +103,7 @@ def run(args):
     jets.Add('top_bit',     '(wtag_bit & 2)? 0: (wtag_bit & 1)? 1: -1') # (if wtag==3 or 2 (subleading w), top_index=0) else (if wtag==1, top_index=1) else (-1)
     jets.Add('top_index',   'top_bit >= 0 ? jetIdx[top_bit] : -1')
     jets.Add('w_index',     'top_index == 0 ? jetIdx[1] : top_index == 1 ? jetIdx[0] : -1')
-    # Calculate some new columns that we'd like to cut on (that were costly to do before the other filtering)
+    # Calculate some new comlumns that we'd like to cut on (that were costly to do before the other filtering)
     jets.Add("lead_vect",   "hardware::TLvector(FatJet_pt[jetIdx[0]],FatJet_eta[jetIdx[0]],FatJet_phi[jetIdx[0]],FatJet_msoftdrop[jetIdx[0]])")
     jets.Add("sublead_vect","hardware::TLvector(FatJet_pt[jetIdx[1]],FatJet_eta[jetIdx[1]],FatJet_phi[jetIdx[1]],FatJet_msoftdrop[jetIdx[1]])")
     jets.Add("deltaY",      "lead_vect.Rapidity()-sublead_vect.Rapidity()")
