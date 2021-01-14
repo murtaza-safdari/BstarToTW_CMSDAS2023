@@ -5,7 +5,7 @@
 ### Setup CMSSW environment:
 ```
 ssh -XY USERNAME@cmslpc-sl7.fnal.gov
-cexport $SCRAM_ARCH=slc7_amd64_gcc820 
+export $SCRAM_ARCH=slc7_amd64_gcc820 
 cd nobackup/
 mkdir b2g_exercise/
 cd b2g_exercise/
@@ -51,4 +51,16 @@ python setup.py install
 cd ../BstarToTW_CMSDAS2020
 git fetch --all
 git pull origin master
+```
+
+## Submitting jobs
+
+Testing one
+```
+python CondorHelper.py -r condor/run_bstar.sh -a test_args.txt -i "bs_select.py bstar.cc bstar_config.json helpers.py"
+```
+
+For 2016:
+```
+python CondorHelper.py -r condor/run_bstar.sh -a all_args.txt  -i "bs_select.py bstar.cc bstar_config.json helpers.py"
 ```
