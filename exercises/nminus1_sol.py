@@ -115,7 +115,7 @@ def select(setname,year):
 
     # Determine normalization weight
     if not a.isData: 
-        norm = helpers.getNormFactor(setname,year,config,a.genEventCount)
+        norm = helpers.getNormFactor(setname,year,config)
     else: 
         norm = 1.
 
