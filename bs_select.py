@@ -38,6 +38,7 @@ args = parser.parse_args()
 ###########################################
 # Deduce set name from input file
 setname = args.input.replace('.root','').split('/')[-1]
+outputname = setname
 setname = '_'.join(setname.split('_')[:-1])
 
 # Flags - https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
@@ -139,7 +140,7 @@ def run(args):
     # Finally discriminate on top tag
     final = a.Discriminate("top_tag_cut","top_tag==1")
 
-    outfile = ROOT.TFile.Open('Presel_%s.root'%(setname),'RECREATE')
+    outfile = ROOT.TFile.Open('Presel_%s.root'%(outputname),'RECREATE')
     hpass = final["pass"].DataFrame.Histo2D(('MtwvMtPass','MtwvMtPass',60, 50, 350, 70, 500, 4000),'mtop','mtw','norm')
     hfail = final["fail"].DataFrame.Histo2D(('MtwvMtFail','MtwvMtFail',60, 50, 350, 70, 500, 4000),'mtop','mtw','norm')
     outfile.cd()
