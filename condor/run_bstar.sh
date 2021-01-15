@@ -6,6 +6,7 @@ xrdcp root://cmseos.fnal.gov//store/user/cmsdas/2021/long_exercises/BstarTW/CMSD
 export SCRAM_ARCH=slc7_amd64_gcc820
 tar -xzvf CMSDAS2021env.tgz
 rm CMSDAS2021env.tgz
+rm *.root
 
 mkdir tardir; cp tarball.tgz tardir/; cd tardir/
 tar -xzf tarball.tgz; rm tarball.tgz
@@ -23,4 +24,4 @@ cd ../BstarToTW_CMSDAS2021
 echo python bs_select.py $*
 python bs_select.py $*
 
-xrdcp Presel_*.root root://cmseos.fnal.gov//store/user/cmantill/bstar_select_tau21_18/
+xrdcp -f Presel_*.root root://cmseos.fnal.gov//store/user/cmantill/bstar_select_tau21_18/
