@@ -19,6 +19,7 @@ import sys
 # TIMBER
 from TIMBER.Analyzer import *
 from TIMBER.Tools.Common import *
+import helpers
 # Other
 import argparse
 import time, sys
@@ -37,6 +38,7 @@ args = parser.parse_args()
 ###########################################
 # Deduce set name from input file
 setname = args.input.replace('.root','').split('/')[-1]
+setname = '_'.join(setname.split('_')[:-1])
 
 # Flags - https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
 flags = ["Flag_goodVertices",
@@ -65,17 +67,9 @@ def run(args):
     ROOT.ROOT.EnableImplicitMT(4)
     a = analyzer(args.input)
 
-    # Config loading - will have cuts, xsec, and lumi
-    config = OpenJSON(args.config)
-    cuts = config['CUTS'][args.year]
-    xsec, lumi = 1., 1.
-    if setname in config['XSECS'].keys() and not a.isData: 
-        xsec = config['XSECS'][setname]
-        lumi = config['lumi']
-
     # Determine normalization weight
     if not a.isData: 
-        norm = (xsec*lumi)/config['NEVENTS'][args.year]['_'.join(setname.split('_')[:-1])]
+        norm = helpers.getNormFactor(setname,args.year,args.config)
     else: 
         norm = 1.
 

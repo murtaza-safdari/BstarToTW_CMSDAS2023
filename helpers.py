@@ -9,7 +9,7 @@ def getNormFactor(setname,year,configPath):
     else: config = configPath
     cuts = config['CUTS'][year]
     lumi = config['lumi'+str(year)]
-    genEventCount = config['NEVENTS'][str(year)]
+    genEventCount = config['NEVENTS'][str(year)][setname]
 
     # Deal with unique ttbar cases
     if setname == 'ttbar' and year == '16':
@@ -23,6 +23,7 @@ def getNormFactor(setname,year,configPath):
         raise KeyError('Key "%s" does not exist in config["XSECS"]'%setname)
 
     norm = (xsec*lumi)/genEventCount
+    print ('%s = %s * %s / %s'%(norm,xsec,lumi,genEventCount))
 
     return norm
 
