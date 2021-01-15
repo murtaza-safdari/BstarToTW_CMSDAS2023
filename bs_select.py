@@ -67,6 +67,10 @@ def run(args):
     ROOT.ROOT.EnableImplicitMT(4)
     a = analyzer(args.input)
 
+    # Config loading - will have cuts, xsec, and lumi
+    config = OpenJSON(args.config)
+    cuts = config['CUTS'][args.year]
+
     # Determine normalization weight
     if not a.isData: 
         norm = helpers.getNormFactor(setname,args.year,args.config)
