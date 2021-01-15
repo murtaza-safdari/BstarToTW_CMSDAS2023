@@ -97,7 +97,7 @@ def run(args):
     # This statement returns 0 for no tag, 1 for lead tag, 2 for sublead tag, and 3 for both tag (which is equivalent to 2 for the sake of deciding what is the W)
     wtag_str = "1*Wtag(FatJet_tau2[jetIdx[0]]/FatJet_tau1[jetIdx[0]],0,{0}, FatJet_msoftdrop[jetIdx[0]],65,105) + 2*Wtag(FatJet_tau2[jetIdx[1]]/FatJet_tau1[jetIdx[1]],0,{0}, FatJet_msoftdrop[jetIdx[1]],65,105)".format(cuts['tau21'])
     if args.deep:
-        wtag_str = "1*WtagDeepAK8(FatJet_deepTagMD_WvsQCD[jetIdx[0]],{0},1, FatJet_msoftdrop[jetIdx[0]],65,105) + 2*Wtag(FatJet_deepTagMD_WvsQCD[jetIdx[0]],{0},1, FatJet_msoftdrop[jetIdx[1]],65,105)".format(cuts['deepAK8w'])
+        wtag_str = "1*WtagDeepAK8(FatJet_deepTagMD_WvsQCD[jetIdx[0]],{0},1, FatJet_msoftdrop[jetIdx[0]],65,105) + 2*WtagDeepAK8(FatJet_deepTagMD_WvsQCD[jetIdx[1]],{0},1, FatJet_msoftdrop[jetIdx[1]],65,105)".format(cuts['deepAK8w'])
 
     jets = VarGroup('jets')
     jets.Add('wtag_bit',    wtag_str)
@@ -136,13 +136,14 @@ def run(args):
     # Apply #
     #########
     a.Apply([jets,tagging_vars,jet_sel])
+    a.Define('norm',str(norm))
 
     # Finally discriminate on top tag
     final = a.Discriminate("top_tag_cut","top_tag==1")
 
     outfile = ROOT.TFile.Open('Presel_%s.root'%(setname),'RECREATE')
-    hpass = final["pass"].DataFrame.Histo2D(('MtwvMtPass','MtwvMtPass',60, 50, 350, 70, 500, 4000),'mtop','mtw')
-    hfail = final["fail"].DataFrame.Histo2D(('MtwvMtFail','MtwvMtFail',60, 50, 350, 70, 500, 4000),'mtop','mtw')
+    hpass = final["pass"].DataFrame.Histo2D(('MtwvMtPass','MtwvMtPass',60, 50, 350, 70, 500, 4000),'mtop','mtw','norm')
+    hfail = final["fail"].DataFrame.Histo2D(('MtwvMtFail','MtwvMtFail',60, 50, 350, 70, 500, 4000),'mtop','mtw','norm')
     outfile.cd()
     hpass.Write()
     hfail.Write()
