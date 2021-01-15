@@ -40,7 +40,8 @@
             "HISTFAIL":"MtwvMtFail",
             "SYSTEMATICS":["lumi","ttbar_xsec"],
             "COLOR": 2,
-            "CODE": 2
+            "CODE": 2,
+            "SCALE": 2.0
         },
         "17_ttbar": {
             "TITLE":"t#bar{t}",
@@ -49,7 +50,8 @@
             "HISTFAIL":"MtwvMtFail",
             "SYSTEMATICS":["lumi","ttbar_xsec"],
             "COLOR": 2,
-            "CODE": 2
+            "CODE": 2,
+            "SCALE": 2.0
         },
         "18_ttbar": {
             "TITLE":"t#bar{t}", 
@@ -58,7 +60,8 @@
             "HISTFAIL":"MtwvMtFail",
             "SYSTEMATICS":["lumi","ttbar_xsec"],
             "COLOR": 2,
-            "CODE": 2
+            "CODE": 2,
+            "SCALE": 2.0
         },
         "17_ttbar-semilep": {
             "TITLE":"t#bar{t}",
@@ -67,7 +70,8 @@
             "HISTFAIL":"MtwvMtFail",
             "SYSTEMATICS":["lumi","ttbar_xsec"],
             "COLOR": 2,
-            "CODE": 2
+            "CODE": 2,
+            "SCALE": 2.0
         },
         "18_ttbar-semilep": {
             "TITLE":"t#bar{t}",
@@ -76,7 +80,8 @@
             "HISTFAIL":"MtwvMtFail",
             "SYSTEMATICS":["lumi","ttbar_xsec"],
             "COLOR": 2,
-            "CODE": 2
+            "CODE": 2,
+            "SCALE": 2.0
         },
         "16_singletop_tW": {
             "TITLE":"Single top",
