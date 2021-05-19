@@ -101,7 +101,8 @@ def select(setname,year):
     ROOT.ROOT.EnableImplicitMT(2) # Just use two threads - no need to kill the interactive nodes
 
     # Initialize TIMBER analyzer
-    file_path = '%s/%s_bstar%s.root' %(rootfile_path,setname, year)
+    file_path = '%s%s_bstar%s.root' %(rootfile_path,setname, year)
+    
     a = analyzer(file_path)
 
     # Determine normalization weight
