@@ -52,7 +52,7 @@ vector<float> TopTaggingSF::eval (LVector top_vect, int nGenPart,
         
         int this_pdgId = *(this_particle->pdgId);
 
-        if (abs(this_pdgId) == 6 && this_particle->DeltaR(top_vect)) {
+        if (abs(this_pdgId) == 6 && this_particle->DeltaR(top_vect) < 0.8) {
             tops.push_back(this_particle);
         } else if (abs(this_pdgId) == 24) {
             Ws.push_back(this_particle);
@@ -73,7 +73,7 @@ vector<float> TopTaggingSF::eval (LVector top_vect, int nGenPart,
                 this_W = W;
                 this_W_children = GPT.GetChildren(this_W);
                 // Make sure the child is not just another W
-                if (this_W_children.size() == 1 and this_W_children[0]->pdgId == W->pdgId) {
+                if (this_W_children.size() == 1 && this_W_children[0]->pdgId == W->pdgId) {
                     this_W = this_W_children[0];
                     this_W_children = GPT.GetChildren(this_W);
                 }
@@ -81,7 +81,7 @@ vector<float> TopTaggingSF::eval (LVector top_vect, int nGenPart,
                 for (int ichild = 0; ichild < this_W_children.size(); ichild++) {
                     wChild = this_W_children[ichild];
                     int child_pdgId = *(wChild->pdgId);
-                    if (abs(child_pdgId) >= 1 and abs(child_pdgId) <= 5) {
+                    if (abs(child_pdgId) >= 1 && abs(child_pdgId) <= 5) {
                         prongs.push_back(wChild);
                     }
                 } 
@@ -95,7 +95,7 @@ vector<float> TopTaggingSF::eval (LVector top_vect, int nGenPart,
         if (abs(*(q->pdgId)) == 5) { // if bottom
             bottom_parent = GPT.GetParent(q);
             if (bottom_parent->flag != false) { // if has parent
-                if (abs(*(bottom_parent->pdgId)) == 6 and bottom_parent->DeltaR(top_vect) < 0.8) { // if parent is a matched top
+                if (abs(*(bottom_parent->pdgId)) == 6 && bottom_parent->DeltaR(top_vect) < 0.8) { // if parent is a matched top
                     prongs.push_back(q);
                 }
             }
