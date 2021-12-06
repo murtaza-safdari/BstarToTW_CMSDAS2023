@@ -16,13 +16,13 @@ cmsenv
 
 ### In the `src` directory, clone repo:
 ```
-git clone https://github.com/cmantill/BstarToTW_CMSDAS2021.git
+git clone https://github.com/ammitra/BstarToTW_CMSDAS2022.git
 ```
 OR fork the code onto your personal project space and set the upstream:
 ```
-git clone https://github.com/<GitHubUsername>/BstarToTW_CMSDAS2021.git
-cd BstarToTW_CMSDAS2021
-git remote add upstream https://github.com/cmantill/BstarToTW_CMSDAS2021.git
+git clone https://github.com/<GitHubUsername>/BstarToTW_CMSDAS2022.git
+cd BstarToTW_CMSDAS2022
+git remote add upstream https://github.com/ammitra/BstarToTW_CMSDAS2022.git
 git remote -v
 ```
 
