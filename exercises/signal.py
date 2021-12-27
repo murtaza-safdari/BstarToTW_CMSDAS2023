@@ -85,7 +85,10 @@ def select(setname,year):
     if not a.isData: 
         # For MC we need to apply the xsec * lumi / NumberOfGeneratedEvents weight
         # This function is a helper defined here: https://github.com/cmantill/BstarToTW_CMSDAS2021/blob/master/helpers.py#L5-L18
-        norm = helpers.getNormFactor(setname,year,config,a.genEventCount)
+
+        #norm = helpers.getNormFactor(setname,year,config,a.genEventCount)
+	norm = helpers.getNormFactor(setname,year,config)
+
     else: 
         norm = 1.
         
