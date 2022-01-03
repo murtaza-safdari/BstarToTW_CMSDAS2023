@@ -9,8 +9,8 @@ export $SCRAM_ARCH=slc7_amd64_gcc820
 cd nobackup/
 mkdir b2g_exercise/
 cd b2g_exercise/
-cmsrel CMSSW_11_0_1
-cd CMSSW_11_0_1/src
+cmsrel CMSSW_11_1_4
+cd CMSSW_11_1_4/src
 cmsenv
 ```
 
@@ -41,16 +41,26 @@ python -c 'import TIMBER.Analyzer'
 
 Once you have an environment:
 ```
-cd CMSSW_11_0_1/src/
+cd CMSSW_11_1_4/src/
 cmsenv
 source timber-env/bin/activate
+```
+
+## If you need to update TIMBER
+```
 cd TIMBER/
 git fetch --all
 git checkout master
-python setup.py install
-cd ../BstarToTW_CMSDAS2020
+python setup.py develop
+cd ../
+```
+
+## If you need to update BstarToTW_CMSDAS2020
+```
+cd BstarToTW_CMSDAS2020
 git fetch --all
 git pull origin master
+cd ../
 ```
 
 ## Submitting jobs
