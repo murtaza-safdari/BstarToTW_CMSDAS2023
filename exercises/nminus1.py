@@ -33,7 +33,7 @@ plotdir = 'plots/' # this is where we'll save your plots
 if not os.path.exists(plotdir):
     os.makedirs(plotdir)
 
-rootfile_path = 'root://cmsxrootd.fnal.gov///store/user/cmsdas/2021/long_exercises/BstarTW/rootfiles'
+rootfile_path = 'root://cmsxrootd.fnal.gov///store/user/cmsdas/2021/long_exercises/BstarTW/rootfiles/'
 config = OpenJSON('bstar_config.json')
 cuts = config['CUTS'][options.year]
 
@@ -107,7 +107,7 @@ def select(setname,year):
 
     # Determine normalization weight
     if not a.isData: 
-        norm = helpers.getNormFactor(setname,year,config,a.genEventCount)
+        norm = helpers.getNormFactor(setname,year,config)
     else: 
         norm = 1.
 
@@ -134,10 +134,10 @@ def select(setname,year):
     jets.Add('top_index',   'top_bit >= 0 ? jetIdx[top_bit] : -1')
     jets.Add('w_index',     'top_index == 0 ? jetIdx[1] : top_index == 1 ? jetIdx[0] : -1')
     # Calculate some new comlumns that we'd like to cut on (that were costly to do before the other filtering)
-    jets.Add("lead_vect",   "analyzer::TLvector(FatJet_pt[jetIdx[0]],FatJet_eta[jetIdx[0]],FatJet_phi[jetIdx[0]],FatJet_msoftdrop[jetIdx[0]])")
-    jets.Add("sublead_vect","analyzer::TLvector(FatJet_pt[jetIdx[1]],FatJet_eta[jetIdx[1]],FatJet_phi[jetIdx[1]],FatJet_msoftdrop[jetIdx[1]])")
+    jets.Add("lead_vect",   "hardware::TLvector(FatJet_pt[jetIdx[0]],FatJet_eta[jetIdx[0]],FatJet_phi[jetIdx[0]],FatJet_msoftdrop[jetIdx[0]])")
+    jets.Add("sublead_vect","hardware::TLvector(FatJet_pt[jetIdx[1]],FatJet_eta[jetIdx[1]],FatJet_phi[jetIdx[1]],FatJet_msoftdrop[jetIdx[1]])")
     jets.Add("deltaY",      "abs(lead_vect.Rapidity()-sublead_vect.Rapidity())")
-    jets.Add("mtw",         "analyzer::invariantMass(lead_vect,sublead_vect)")
+    jets.Add("mtw",         "hardware::InvariantMass({lead_vect + sublead_vect})")
     
     #########
     # N - 1 #
@@ -159,7 +159,7 @@ def select(setname,year):
 
     # Organize N-1 of tagging variables when assuming top is always leading
     nodeToPlot = a.Apply([jets,plotting_vars])
-    nminus1Nodes = a.Nminus1(nodeToPlot,N_cuts) # constructs N nodes with a different N-1 selection for each
+    nminus1Nodes = a.Nminus1(N_cuts,node=nodeToPlot) # constructs N nodes with a different N-1 selection for each
     nminus1Hists = HistGroup('nminus1Hists')
     binning = {
         'mtop': [25,50,300],
