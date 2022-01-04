@@ -118,7 +118,7 @@ def select(setname,year):
 
     # Determine normalization weight
     if not a.isData: 
-        norm = helpers.getNormFactor(setname,year,config,a.genEventCount)
+        norm = helpers.getNormFactor(setname,year,config)
     else: 
         norm = 1.
         
@@ -133,7 +133,7 @@ def select(setname,year):
     a.Cut('mjet_cut','FatJet_msoftdrop[jetIdx[0]] > 50 && FatJet_msoftdrop[jetIdx[1]] > 50')
     a.Define('lead_vector', 'hardware::TLvector(FatJet_pt[jetIdx[0]],FatJet_eta[jetIdx[0]],FatJet_phi[jetIdx[0]],FatJet_mass[jetIdx[0]])')
     a.Define('sublead_vector','hardware::TLvector(FatJet_pt[jetIdx[1]],FatJet_eta[jetIdx[1]],FatJet_phi[jetIdx[1]],FatJet_mass[jetIdx[1]])')
-    a.Define('invariantMass','hardware::invariantMass({lead_vector,sublead_vector})')
+    a.Define('invariantMass','hardware::InvariantMass({lead_vector,sublead_vector})')
     a.Cut('mtw_cut','invariantMass > 1200')
     a.Define('deltaphi','hardware::DeltaPhi(FatJet_phi[jetIdx[0]],FatJet_phi[jetIdx[1]])')
     a.Define('lead_tau32','FatJet_tau2[jetIdx[0]] > 0 ? FatJet_tau3[jetIdx[0]]/FatJet_tau2[jetIdx[0]] : -1') # Conditional to make sure tau2 != 0 for division
