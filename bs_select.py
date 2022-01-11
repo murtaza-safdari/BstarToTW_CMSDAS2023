@@ -107,7 +107,7 @@ def run(args):
     jets.Add("lead_vect",   "hardware::TLvector(FatJet_pt[jetIdx[0]],FatJet_eta[jetIdx[0]],FatJet_phi[jetIdx[0]],FatJet_msoftdrop[jetIdx[0]])")
     jets.Add("sublead_vect","hardware::TLvector(FatJet_pt[jetIdx[1]],FatJet_eta[jetIdx[1]],FatJet_phi[jetIdx[1]],FatJet_msoftdrop[jetIdx[1]])")
     jets.Add("deltaY",      "lead_vect.Rapidity()-sublead_vect.Rapidity()")
-    jets.Add("mtw",         "hardware::invariantMass({lead_vect,sublead_vect})")
+    jets.Add("mtw",         "hardware::InvariantMass({lead_vect,sublead_vect})")
 
     # W and top
     tagging_vars = VarGroup('tagging_vars') 
