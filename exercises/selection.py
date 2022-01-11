@@ -214,7 +214,7 @@ if __name__ == "__main__":
             inhist = infile.Get(key.GetName()) # get it from the file
             inhist.SetDirectory(0) # set the directory so hist is stored in memory and not as reference to TFile (this way it doesn't get tossed by python garbage collection when infile changes)
             histgroups[setname].Add(varname,inhist) # add to our group
-            print('add var  name for ',setname)
+            print('add var {} for {}'.format(varname, setname))
 
     # For each variable to plot...
     for varname in varnames.keys():
@@ -242,4 +242,4 @@ if __name__ == "__main__":
         for sig in signal_names: signal_hists[sig] = histgroups[sig][varname]#all_hists[sig] = histgroups[sig][varname]#
 
         # Plot everything together!
-        CompareShapes(plot_filename,options.year,varnames[varname],bkgs=bkg_hists,signals=signal_hists,colors=colors,names=names)
+        CompareShapes(plot_filename,options.year,varnames[varname],bkgs=bkg_hists,signals=signal_hists,colors=colors,names=names,stackBkg=True)
