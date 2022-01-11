@@ -161,6 +161,9 @@ def select(setname,year):
     nodeToPlot = a.Apply([jets,plotting_vars])
     nminus1Nodes = a.Nminus1(N_cuts,node=nodeToPlot) # constructs N nodes with a different N-1 selection for each
     nminus1Hists = HistGroup('nminus1Hists')
+
+    a.PrintNodeTree(plotdir+'/nminus1_tree.dot',verbose=True)
+
     binning = {
         'mtop': [25,50,300],
         'mW': [25,30,270],
