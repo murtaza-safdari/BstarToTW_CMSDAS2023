@@ -5,7 +5,7 @@
 ### Setup CMSSW environment:
 ```
 ssh -XY USERNAME@cmslpc-sl7.fnal.gov
-export $SCRAM_ARCH=slc7_amd64_gcc820 
+export SCRAM_ARCH=slc7_amd64_gcc820 
 cd ~/nobackup/
 mkdir CMSDAS2023
 cd CMSDAS2023/
