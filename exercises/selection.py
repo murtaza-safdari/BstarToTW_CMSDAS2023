@@ -131,7 +131,7 @@ def select(setname, year):
 
     # Before finishing up, create plots of the variables stored in the varnames dictionary
     print('Plotting the following variables:')
-    outFile = ROOT.TFile.Open('rootfiles/{}_{}.root'.format(setname, year),'RECREATE')
+    outFile = ROOT.TFile.Open('rootfiles/{}_{}_selection.root'.format(setname, year),'RECREATE')
     outFile.cd()
     # Book a group to save the histograms
     hists = HistGroup('{}_{}'.format(setname, year))
@@ -160,7 +160,7 @@ def select(setname, year):
     hists.Do('Write')
 
     # For fun, print the TIMBER node tree for a visualization of your selection
-    a.PrintNodeTree('{}/{}_snapshot_tree.dot'.format(plotdir,setname), verbose=True)
+    a.PrintNodeTree('{}/{}_{}_selection_tree.dot'.format(plotdir,setname, year), verbose=True)
 
     # Finally, safely close the analyzer and rootfile
     outFile.Close()
