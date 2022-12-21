@@ -77,29 +77,33 @@ git pull origin master
 cd ../
 ```
 
-## Submitting jobs
+## Submitting Condor jobs
 
-Modify username and output directory in `condor/run_bstar.sh` e.g.:
+Create the appropriate output directory in your EOS space:
 ```
-root://cmseos.fnal.gov//store/user/$USER/bstar_select_tau21/
-```
-
-also create the directory:
-```
-eosmkdir /store/user/$USER/bstar_select_tau21
+eosmkdir /store/user/$USER/CMSDAS2023/rootfiles/
 ```
 
-Test it works on one file:
+You can now run either your selection or N-1 script:
+
+*Selection:*
 ```
-python CondorHelper.py -r condor/run_bstar.sh -a test_args.txt -i "bs_select.py bstar.cc bstar_config.json helpers.py"
+python CondorHelper.py -r condor/run_selection.sh -a condor/2016_args.txt -i "bstar.cc bstar_config.json helpers.py"
 ```
 
-For 2016 (then change args file for other years):
+*N - 1:*
 ```
-python CondorHelper.py -r condor/run_bstar.sh -a 2016_args.txt  -i "bs_select.py bstar.cc bstar_config.json helpers.py"
+python CondorHelper.py -r condor/run_Nminus1.sh -a condor/2016_args.txt -i "bstar.cc bstar_config.json helpers.py"
 ```
 
-Check jobs:
+The argument files for the various years are:
+```
+condor/2016_args.txt
+condor/2017_args.txt
+condor/2018_args.txt
+```
+
+To check the progress/submission status of your jobs:
 ```
 condor_q $USER
 ```
