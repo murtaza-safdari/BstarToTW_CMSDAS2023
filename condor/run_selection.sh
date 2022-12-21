@@ -11,6 +11,9 @@ rm *.root
 mkdir tardir; cp tarball.tgz tardir/; cd tardir/
 tar -xzf tarball.tgz; rm tarball.tgz
 cp -r * ../CMSSW_11_1_4/src/BstarToTW_CMSDAS2023/; cd ../CMSSW_11_1_4/src/
+echo 'IN RELEASE'
+pwd
+ls
 eval `scramv1 runtime -sh`
 rm -rf timber-env
 python -m virtualenv timber-env
