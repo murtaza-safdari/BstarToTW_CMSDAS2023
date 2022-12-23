@@ -75,7 +75,13 @@ if __name__ == "__main__":
                         help='Year of set (16, 17, 18).')
     parser.add_argument('--nminus1',
 			action='store_true',
-			help='Whether or not to plot N-1 distributions instead of selection')
+			help='If flag passed, plot N-1 distributions instead of selection')
+    parser.add_argument('--logy',
+                        action='store_true',
+                        help='If flag passed, plot logarithmic distributions')
+    parser.add_argument('--soverb',
+                        action='store_true',
+                        help='If flag passed, add a sub pad with signal/sqrt(background) calculation')
     args = parser.parse_args()
 
     # Store all of the histograms we want to track
@@ -88,7 +94,7 @@ if __name__ == "__main__":
 	if (sample=='QCD') or (sample=='singletop'): 
 	    # These are just stored to concatenate the QCD/singletop backgrounds, ignore
 	    continue
-	inFile = ROOT.TFile.Open('rootfiles/{}_{}{}.root'.format(sample, args.year, '_Nminus1' if args.nminus1 else ''))
+	inFile = ROOT.TFile.Open('rootfiles/{}_{}{}.root'.format(sample, args.year, '_Nminus1' if args.nminus1 else '_selection'))
 	if inFile == None:
 	    #print('WARNING: rootfiles/{}_{}{}.root does not exist, please create first\n'.format(sample, args.year, '_Nminus1' if args.nminus1 else ''))
 	    continue	
@@ -118,20 +124,18 @@ if __name__ == "__main__":
 	    print(j)
     '''
 
-    # Get the variable names list
+    # Get the variable names list. The following format ensures that, as long as one file has been processed, 
+    # the proper variable names will be found without the user having to specify anything additional.
     ExistingVarnames = histgroups[list(histgroups.keys())[0]].keys()
-    #ExistingVarnames = histgroups['ttbar'].keys()
-    print(ExistingVarnames)
 
     # Now plot the variables up in the global definitions above
     for varname in ExistingVarnames:
-	plot_filename = 'plots/{}_{}{}.png'.format(varname, args.year, '_Nminus1' if args.nminus1 else '')
-	print(plot_filename)	
+	plot_filename = 'plots/{}_{}{}{}{}.png'.format(varname, args.year, '_Nminus1' if args.nminus1 else '','_SoverB' if args.soverb else '', '_logy' if args.logy else '')
 	# Setup ordered dictionaries so processes plot in the order we specify
 	bkg_hists, signal_hists = OrderedDict(), OrderedDict()
 	# First do bkgs, plotting largest first
 	for bkg in ['QCDHT700','QCDHT1000','QCDHT1500','QCDHT2000','ttbar','singletop_tW','singletop_tWB']:
-	    if bkg not in histgroups.keys(): continue	# ensures user doesn't have to modify list
+	    if bkg not in histgroups.keys(): continue	# ensures user doesn't have to modify above list
 	    histgroups[bkg][varname].SetTitle('{} 20{}'.format(varname, args.year))
 	    if 'QCD' in bkg:
 		if 'QCD' not in bkg_hists.keys():
@@ -145,14 +149,19 @@ if __name__ == "__main__":
 		    bkg_hists['singletop'].Add(histgroups[bkg][varname])
 	    else:
 		# Only bkg left is ttbar, which doesn't get concatenated
-		bkg_hists[bkg] = (histgroups[bkg][varname])
+		bkg_hists[bkg] = histgroups[bkg][varname]
 	# Now, add the signals
 	for sig in samples.keys():
 	    if 'signal' not in sig: continue
 	    signal_hists[sig] = histgroups[sig][varname]
 
+	# QCD has a *LOT* more entries than the other backgrounds, so normalize to ttbar before plotting
+	QCDint = bkg_hists['QCD'].Integral()
+	TTint = bkg_hists['ttbar'].Integral()
+	ratio = TTint/QCDint
+	bkg_hists['QCD'].Scale(ratio)
+
 	# Plot everything together!
-	print('Plotting everything for {}...'.format(varname))	
 	CompareShapes(
 	    outfilename = plot_filename,
 	    year = args.year,
@@ -161,6 +170,7 @@ if __name__ == "__main__":
 	    signals = signal_hists,
 	    colors = colors,
 	    names = samples,
+	    logy = args.logy,
+	    doSoverB = args.soverb,
 	    stackBkg = True
 	)
-
