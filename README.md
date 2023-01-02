@@ -1,4 +1,4 @@
-# BstarToTW_CMSDAS2021
+# BstarToTW_CMSDAS2023
 
 ## Getting started (in bash shell)
 
