@@ -190,4 +190,10 @@ if __name__ == "__main__":
         for sig in signal_names: signal_hists[sig] = histgroups[sig][varname]
 
         # Plot everything together!
-        CompareShapes(plot_filename, options.year, varnames[varname], bkgs={}, signals=signal_hists,scale=True,stackBkg=False,doSoverB=False)
+	EasyPlots(
+	    name = plot_filename, 
+	    histlist = [signal_hists[sig]],
+	    xtitle = varnames[varname],
+	    ytitle = 'Events',
+	    datastyle = 'hist'
+	)
