@@ -7,3 +7,5 @@
 *.tgz
 *.log
 docker_stderror
+logs/
+condor/logs/
