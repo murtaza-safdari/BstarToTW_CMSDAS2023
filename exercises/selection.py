@@ -52,6 +52,7 @@ varnames = {
         'deltaphi'		 : '#Delta#phi_{jet0,jet1}',
         'lead_softdrop_mass'     : 'm_{SD}^{jet0}',
         'sublead_softdrop_mass'  : 'm_{SD}^{jet1}',
+        'invariantMass': 'm_{SD}^{inv}',
         'lead_deepAK8_TvsQCD'    : 'Deep AK8 TvsQCD^{jet0}',
         'sublead_deepAK8_TvsQCD' : 'Deep AK8 TvsQCD^{jet1}',
         'lead_deepAK8_WvsQCD'    : 'Deep AK8 WvsQCD^{jet0}',
@@ -149,6 +150,8 @@ def select(setname, year):
             hist_tuple = (histname,histname,30,-3.2,3.2)
         elif "softdrop_mass" in varname :
             hist_tuple = (histname,histname,30,0,300)
+        elif "invariantMass" in varname :
+            hist_tuple = (histname,histname,400,0,4000)
         else:
             hist_tuple = (histname,histname,20,0,1)
 	# Project dataframe into a histogram (hist name/binning tuple, variable to plot from dataframe, weight)
